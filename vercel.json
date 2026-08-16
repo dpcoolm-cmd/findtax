@@ -1,0 +1,29 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.findtax.kr" }],
+      "destination": "https://findtax.kr/$1",
+      "permanent": true
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/expire-assignments",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/tax-case-reminders",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}

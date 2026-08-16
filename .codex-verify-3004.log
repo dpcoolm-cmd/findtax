@@ -1,0 +1,10 @@
+
+> dongne-tax-lead-platform@0.1.0 start
+> next start --port 3004
+
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3004
+   - Network:      http://192.168.219.104:3004
+
+ ✓ Starting...
+ ✓ Ready in 1373ms

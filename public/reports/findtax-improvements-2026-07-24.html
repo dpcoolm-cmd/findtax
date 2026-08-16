@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="2026년 7월 24일 FindTax 제품, 기능, 데이터, 운영 및 히어로 개선 As-is/To-be 보고서"
+    />
+    <title>FindTax 개선 보고서 | 2026.07.24</title>
+    <style>
+      :root {
+        --ink: #171713;
+        --muted: #68675f;
+        --line: #dcdcd4;
+        --paper: #ffffff;
+        --surface: #f2f4ef;
+        --surface-strong: #e6eae2;
+        --brown: #3c2d24;
+        --green: #285b43;
+        --lime: #9be66a;
+        --red: #9c443d;
+        --amber: #9a6717;
+        --shadow: 0 12px 30px rgba(33, 37, 30, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--surface);
+        color: var(--ink);
+        font-family:
+          Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
+          sans-serif;
+        line-height: 1.6;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        min-height: 64px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--brown);
+        color: var(--lime);
+        font-weight: 900;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .text-link,
+      .print-button {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+        padding: 8px 13px;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 44px 0 90px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.6fr);
+        gap: 56px;
+        align-items: end;
+        padding: 52px 0 50px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        margin: 0 0 16px;
+        color: var(--green);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 820px;
+        margin-bottom: 20px;
+        font-size: clamp(38px, 5.5vw, 68px);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .hero-copy {
+        max-width: 760px;
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .hero-status {
+        border-left: 4px solid var(--lime);
+        background: var(--brown);
+        padding: 24px;
+        color: #fff;
+      }
+
+      .hero-status strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 24px;
+      }
+
+      .hero-status p {
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 14px;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin: 28px 0 64px;
+      }
+
+      .metric {
+        min-height: 128px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .metric-value {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--green);
+        font-size: 30px;
+        font-weight: 900;
+      }
+
+      .metric-label {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .section {
+        margin-top: 72px;
+        scroll-margin-top: 90px;
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+        gap: 30px;
+        align-items: end;
+        margin-bottom: 26px;
+      }
+
+      .section-heading h2 {
+        margin-bottom: 0;
+        font-size: clamp(28px, 3.6vw, 44px);
+        line-height: 1.15;
+      }
+
+      .section-heading p {
+        margin-bottom: 4px;
+        color: var(--muted);
+      }
+
+      .compare-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .compare-row {
+        display: grid;
+        grid-template-columns: 180px minmax(0, 1fr) 48px minmax(0, 1fr);
+        gap: 18px;
+        align-items: stretch;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+        padding: 20px;
+      }
+
+      .compare-category {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .compare-category strong {
+        font-size: 17px;
+      }
+
+      .state-label {
+        display: inline-flex;
+        width: fit-content;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .state-label.done {
+        background: #e7f5df;
+        color: #285f35;
+      }
+
+      .state-label.partial {
+        background: #fff2cf;
+        color: #7e5715;
+      }
+
+      .state-block {
+        min-width: 0;
+        border-left: 2px solid var(--line);
+        padding-left: 16px;
+      }
+
+      .state-block.to-be {
+        border-color: var(--green);
+      }
+
+      .state-title {
+        margin-bottom: 7px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .state-block p {
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+
+      .arrow {
+        display: grid;
+        place-items: center;
+        color: var(--green);
+        font-size: 26px;
+        font-weight: 900;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--paper);
+      }
+
+      .flow-step {
+        position: relative;
+        min-height: 170px;
+        border-right: 1px solid var(--line);
+        padding: 22px;
+      }
+
+      .flow-step:last-child {
+        border-right: 0;
+      }
+
+      .flow-number {
+        display: block;
+        margin-bottom: 22px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .flow-step strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 17px;
+      }
+
+      .flow-step p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .data-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .data-panel {
+        border-top: 4px solid var(--brown);
+        background: var(--paper);
+        padding: 24px;
+      }
+
+      .data-panel.green {
+        border-color: var(--green);
+      }
+
+      .data-panel.lime {
+        border-color: var(--lime);
+      }
+
+      .data-panel h3 {
+        margin-bottom: 12px;
+        font-size: 19px;
+      }
+
+      .data-panel ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .data-panel li + li {
+        margin-top: 7px;
+      }
+
+      .validation-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--paper);
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 16px 18px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--surface-strong);
+        font-size: 12px;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .pass {
+        color: var(--green);
+        font-weight: 900;
+      }
+
+      .pending-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .pending-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+        padding: 22px;
+      }
+
+      .priority {
+        display: inline-block;
+        margin-bottom: 14px;
+        color: var(--amber);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .pending-item h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      .pending-item p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .footer-note {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-top: 72px;
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .section-heading {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          gap: 28px;
+          padding-top: 34px;
+        }
+
+        .metric-grid,
+        .data-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .compare-row {
+          grid-template-columns: 140px minmax(0, 1fr);
+        }
+
+        .compare-category {
+          grid-row: span 2;
+        }
+
+        .arrow {
+          display: none;
+        }
+
+        .flow {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-step {
+          min-height: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .flow-step:last-child {
+          border-bottom: 0;
+        }
+
+        .flow-number {
+          margin-bottom: 10px;
+        }
+
+        .pending-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .topbar-inner,
+        main {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .top-actions .text-link {
+          display: none;
+        }
+
+        main {
+          padding-top: 20px;
+        }
+
+        h1 {
+          font-size: 38px;
+        }
+
+        .metric-grid,
+        .data-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .compare-row {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+
+        .compare-category {
+          grid-row: auto;
+        }
+
+        .state-block {
+          border-left: 0;
+          border-top: 2px solid var(--line);
+          padding: 14px 0 0;
+        }
+
+        .state-block.to-be {
+          border-color: var(--green);
+        }
+
+        .footer-note {
+          flex-direction: column;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .topbar {
+          position: static;
+        }
+
+        .top-actions {
+          display: none;
+        }
+
+        main {
+          width: 100%;
+          padding: 20px 0;
+        }
+
+        .metric,
+        .compare-row,
+        .validation-table-wrap,
+        .pending-item {
+          break-inside: avoid;
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-mark">F</span>
+          <span>FindTax 개선 보고서</span>
+        </div>
+        <div class="top-actions">
+          <a class="text-link" href="/">개발 홈 보기</a>
+          <button class="print-button" type="button" onclick="window.print()">인쇄 · PDF 저장</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">PRODUCT UPDATE · 2026.07.24</p>
+          <h1>계산기 모음에서 세금 실행 플랫폼으로</h1>
+          <p class="hero-copy">
+            오늘 FindTax는 증여세·1인사업자·연금/IRP 중심의 실행 흐름을 만들고, 관리자 데이터와
+            히어로 메시지, 저장 이후의 관리 경험을 같은 방향으로 정렬했습니다.
+          </p>
+        </div>
+        <aside class="hero-status" aria-label="오늘 작업 상태">
+          <strong>핵심 범위 완료</strong>
+          <p>기능 구현 · DB 보안 강화 · 계산 검증 · 운영 배포 · 히어로 개편</p>
+        </aside>
+      </section>
+
+      <section class="metric-grid" aria-label="오늘의 주요 결과">
+        <article class="metric">
+          <span class="metric-value">3</span>
+          <span class="metric-label">핵심 실행 엔진<br />증여세 · 1인사업자 · 연금/IRP</span>
+        </article>
+        <article class="metric">
+          <span class="metric-value">4</span>
+          <span class="metric-label">핵심 사용자 경로<br />사업 · 셀러 · 증여 · 절세</span>
+        </article>
+        <article class="metric">
+          <span class="metric-value">30/30</span>
+          <span class="metric-label">계산 안전성 테스트 통과</span>
+        </article>
+        <article class="metric">
+          <span class="metric-value">Ready</span>
+          <span class="metric-label">Vercel 운영 배포 상태</span>
+        </article>
+      </section>
+
+      <section class="section" id="comparison">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">AS-IS → TO-BE</p>
+            <h2>오늘 바뀐 핵심</h2>
+          </div>
+          <p>
+            단순히 화면을 추가한 것이 아니라 사용자가 세금을 판단하고, 실행하고, 완료하는
+            흐름까지 연결했습니다.
+          </p>
+        </div>
+
+        <div class="compare-list">
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>서비스 정체성</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>여러 세목의 예상 금액을 보여주는 계산기·세무사 검색 사이트</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>세금 계산 후 직접 처리 여부, 준비자료, 신고기한과 다음 행동까지 안내하는 플랫폼</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>핵심 타깃</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>누구나 이용하는 범용 세금 계산 서비스로 보여 고객상이 불명확</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>1인사업자, 부업러, 온라인·글로벌 셀러와 가족 증여 준비 고객을 전면에 제시</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>증여세</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>관계와 금액을 기준으로 예상 증여세를 계산하는 단발성 도구</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>10년 공제 한도, 과거 증여, 신고기한, 복잡도, 직접 신고 여부까지 하나의 케이스로 관리</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>1인사업자</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>부가세·종소세 등 세목별 계산기가 분리되어 전체 의무와 일정을 파악하기 어려움</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>사업 상태에 맞춰 부가세·종소세·원천세·지급명세서와 다음 일정을 연간 운영표로 제공</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>연금·IRP</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>연봉과 납입액만으로 공제 효과를 보여 주는 단순 계산기</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>직장인·사업자·혼합소득, 현금흐름, ISA 전환을 함께 보고 실제 잔여 한도 안에서만 납입 순서를 제안</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>셀러 대응</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>구매대행·역직구 관련 콘텐츠는 있었지만 첫 화면에서 발견하기 어려움</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>히어로에서 온라인·글로벌 셀러를 명시하고 업종별 증빙·세금 위험도 진단으로 바로 연결</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>실행 관리</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>계산 결과를 확인한 뒤 사용자가 다음 절차를 별도로 찾아야 함</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>직접 신고·전문가 진행 선택, 준비서류 체크, 홈택스 이동, 완료 처리까지 연속 제공</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>회원·재방문</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>비회원 계산 중심이라 이전 판단 결과와 진행 상태를 이어 보기 어려움</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>비회원으로 시작한 뒤 필요할 때 로그인하여 내 세금에 케이스와 진행 상태를 저장</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>관리자 인사이트</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>방문·상담 데이터는 보이지만 사용자가 계산 후 실제로 무엇을 했는지 파악하기 어려움</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>세금 유형별 생성, 저장, 방식 선택, 자료 준비, 완료 전환율을 관리자 화면에서 확인</p>
+            </div>
+          </article>
+
+          <article class="compare-row">
+            <div class="compare-category">
+              <strong>히어로</strong>
+              <span class="state-label done">반영 완료</span>
+            </div>
+            <div class="state-block">
+              <p class="state-title">As-is</p>
+              <p>“세금 문제, 계산부터”라는 범용 메시지와 계산기·세무사 찾기 중심 CTA</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="state-block to-be">
+              <p class="state-title">To-be</p>
+              <p>사업·판매 세금과 다음 할 일을 강조하고 사업 정리·셀러 진단 CTA와 세 가지 상황 선택 제공</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="flow">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">USER FLOW</p>
+            <h2>새로운 핵심 흐름</h2>
+          </div>
+          <p>
+            가입을 먼저 강요하지 않고 가치를 경험한 뒤 저장하도록 설계해 초기 이탈을 줄였습니다.
+          </p>
+        </div>
+
+        <div class="flow">
+          <article class="flow-step">
+            <span class="flow-number">01 · 진입</span>
+            <strong>상황 선택</strong>
+            <p>사업·부업, 글로벌 판매, 가족 증여 중 현재 상황을 선택합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">02 · 진단</span>
+            <strong>계산과 판단</strong>
+            <p>금액, 한도, 복잡도와 다음 신고 일정을 확인합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">03 · 선택</span>
+            <strong>직접 또는 전문가</strong>
+            <p>직접 처리할지 세무사 검토를 받을지 판단합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">04 · 실행</span>
+            <strong>자료와 신고</strong>
+            <p>준비서류를 체크하고 홈택스 또는 상담으로 이동합니다.</p>
+          </article>
+          <article class="flow-step">
+            <span class="flow-number">05 · 관리</span>
+            <strong>저장과 완료</strong>
+            <p>내 세금에 저장하고 완료 상태와 향후 일정을 관리합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="system">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SYSTEM & DATA</p>
+            <h2>화면 뒤에서 바뀐 것</h2>
+          </div>
+          <p>사용자 기능이 실제 운영 데이터로 남도록 서버와 데이터베이스까지 함께 확장했습니다.</p>
+        </div>
+
+        <div class="data-grid">
+          <article class="data-panel">
+            <h3>공통 세금 케이스</h3>
+            <ul>
+              <li>부가세 전용 구조를 증여세·1인사업자·연금/IRP까지 확장</li>
+              <li>유형별 입력 맥락과 판단 결과 저장</li>
+              <li>할 일·서류·진행 방식·완료 상태 공통 관리</li>
+            </ul>
+          </article>
+          <article class="data-panel green">
+            <h3>Supabase</h3>
+            <ul>
+              <li>가이드형 세금 케이스 스키마 확장</li>
+              <li>세금 일정 알림 데이터 구조 추가</li>
+              <li>관리자 유형별 퍼널 집계 함수 적용</li>
+              <li>케이스 생성 RPC를 서버 서비스 역할 전용으로 제한</li>
+            </ul>
+          </article>
+          <article class="data-panel lime">
+            <h3>관리자 운영</h3>
+            <ul>
+              <li>증여세·1인사업자·연금 유형별 생성 건수</li>
+              <li>직접 신고·전문가 진행 선택 비율</li>
+              <li>자료 준비와 완료 도달률 확인</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="validation">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">QUALITY CHECK</p>
+            <h2>검증과 배포</h2>
+          </div>
+          <p>코드 컴파일뿐 아니라 운영 환경에서 실제 사용자 흐름과 관리자 집계까지 확인했습니다.</p>
+        </div>
+
+        <div class="validation-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>검증 항목</th>
+                <th>결과</th>
+                <th>확인 내용</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>TypeScript</td>
+                <td class="pass">통과</td>
+                <td>타입 오류 없음</td>
+              </tr>
+              <tr>
+                <td>계산 안전성 테스트</td>
+                <td class="pass">30/30 통과</td>
+                <td>증여일·사업자 의무·ISA 잔여 한도·과다 생성 제한 테스트 포함</td>
+              </tr>
+              <tr>
+                <td>Next.js 빌드</td>
+                <td class="pass">통과</td>
+                <td>2,335개 정적 페이지 생성 완료</td>
+              </tr>
+              <tr>
+                <td>증여세 운영 흐름</td>
+                <td class="pass">통과</td>
+                <td>케이스 생성 → 직접 신고 선택 → 완료 확인</td>
+              </tr>
+              <tr>
+                <td>1인사업자 운영 흐름</td>
+                <td class="pass">통과</td>
+                <td>운영표 생성 → 일정 확인 → 직접 진행 → 완료 확인</td>
+              </tr>
+              <tr>
+                <td>연금·IRP 운영 흐름</td>
+                <td class="pass">통과</td>
+                <td>소득 유형 진단 → 납입 순서 → 저장 → 할 일 관리 확인</td>
+              </tr>
+              <tr>
+                <td>DB 생성 권한</td>
+                <td class="pass">강화</td>
+                <td>익명 직접 RPC 생성을 차단하고 서버 전용 쓰기로 분리</td>
+              </tr>
+              <tr>
+                <td>관리자 인사이트</td>
+                <td class="pass">통과</td>
+                <td>증여세·1인사업자·연금 유형별 퍼널 집계 확인</td>
+              </tr>
+              <tr>
+                <td>운영 배포</td>
+                <td class="pass">Ready</td>
+                <td>findtax.kr 프로덕션 별칭 연결 확인</td>
+              </tr>
+              <tr>
+                <td>검증 데이터 정리</td>
+                <td class="pass">완료</td>
+                <td>운영 검증용 케이스 삭제 및 잔여 0건 확인</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="next">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NEXT PRIORITIES</p>
+            <h2>아직 남은 개선 후보</h2>
+          </div>
+          <p>
+            아래 항목은 오늘 논의했지만 아직 코드에 반영하지 않았습니다. 기능 안정화 후 순서대로
+            진행하는 것이 좋습니다.
+          </p>
+        </div>
+
+        <div class="pending-grid">
+          <article class="pending-item">
+            <span class="priority">우선순위 1</span>
+            <h3>히어로 결과 예시</h3>
+            <p>예상 세금, 신고기한, 직접 신고 가능 여부를 첫 화면에서 미리 보여 전환 이유를 강화합니다.</p>
+          </article>
+          <article class="pending-item">
+            <span class="priority">우선순위 2</span>
+            <h3>광고 노출 시점</h3>
+            <p>쿠팡 고정 배너가 첫 진단을 가리지 않도록 결과 확인 이후 노출 또는 접기 기능을 검토합니다.</p>
+          </article>
+          <article class="pending-item">
+            <span class="priority">우선순위 3</span>
+            <h3>교차 서비스 배너</h3>
+            <p>Home-atoz 링크는 유지하되 FindTax 첫 행동보다 강하게 보이지 않도록 대비와 높이를 조정합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer-note">
+        <span>FindTax Product Improvement Report</span>
+        <span>작성 기준: 2026년 7월 24일 실제 구현·검증·배포 내역</span>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+
+> dongne-tax-lead-platform@0.1.0 dev
+> next dev --port 3000
+
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.219.104:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.7s
+ ○ Compiling /calculator/[slug] ...
+ ✓ Compiled /calculator/[slug] in 13.6s (971 modules)
+ GET /calculator/%EC%97%B0%EA%B8%88%C2%B7IRP-%EC%A0%88%EC%84%B8 404 in 16343ms
