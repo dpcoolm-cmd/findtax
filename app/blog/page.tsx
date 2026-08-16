@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  BLOG_CATEGORIES,
+  countByCategory,
+  getBlogCategory,
+  isBlogCategoryId,
+  resolveBlogCategory,
+  type BlogCategoryId,
+} from "@/lib/blog/categories";
 import { BLOG_ARTICLES } from "@/lib/blog/posts";
 import { absoluteUrl } from "@/lib/seo/urls";
 
@@ -23,26 +31,45 @@ export const metadata: Metadata = {
 type BlogIndexPageProps = {
   searchParams?: Promise<{
     page?: string | string[];
+    category?: string | string[];
   }>;
 };
 
+function firstParam(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 function getPageNumber(rawPage?: string | string[]) {
-  const value = Array.isArray(rawPage) ? rawPage[0] : rawPage;
-  const page = Number(value ?? "1");
+  const page = Number(firstParam(rawPage) ?? "1");
   if (!Number.isFinite(page) || page < 1) return 1;
   return Math.floor(page);
 }
 
-function pageHref(page: number) {
-  return page <= 1 ? "/blog" : `/blog?page=${page}`;
+function buildHref(page: number, category: BlogCategoryId | null) {
+  const params = new URLSearchParams();
+  if (category) params.set("category", category);
+  if (page > 1) params.set("page", String(page));
+  const qs = params.toString();
+  return qs ? `/blog?${qs}` : "/blog";
 }
 
 export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const totalPages = Math.max(1, Math.ceil(BLOG_ARTICLES.length / PAGE_SIZE));
+
+  const rawCategory = firstParam(resolvedSearchParams.category);
+  const activeCategory: BlogCategoryId | null =
+    rawCategory && isBlogCategoryId(rawCategory) ? rawCategory : null;
+
+  const counts = countByCategory(BLOG_ARTICLES);
+  const filteredArticles = activeCategory
+    ? BLOG_ARTICLES.filter((a) => resolveBlogCategory(a).id === activeCategory)
+    : BLOG_ARTICLES;
+
+  const totalPages = Math.max(1, Math.ceil(filteredArticles.length / PAGE_SIZE));
   const currentPage = Math.min(getPageNumber(resolvedSearchParams.page), totalPages);
   const start = (currentPage - 1) * PAGE_SIZE;
-  const visibleArticles = BLOG_ARTICLES.slice(start, start + PAGE_SIZE);
+  const visibleArticles = filteredArticles.slice(start, start + PAGE_SIZE);
+  const activeCategoryInfo = activeCategory ? getBlogCategory(activeCategory) : null;
 
   return (
     <div className="app-shell-frame py-10 sm:py-14">
@@ -69,9 +96,50 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
         </p>
       </section>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+      <nav className="mt-8" aria-label="카테고리">
+        <ul className="flex flex-wrap gap-2">
+          <li>
+            <Link
+              href={buildHref(1, null)}
+              aria-current={activeCategory === null ? "page" : undefined}
+              className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm font-bold transition-colors ${
+                activeCategory === null
+                  ? "bg-ink text-white"
+                  : "border border-line bg-white text-ink-muted hover:border-line-strong hover:text-ink"
+              }`}
+            >
+              전체 {BLOG_ARTICLES.length}
+            </Link>
+          </li>
+          {BLOG_CATEGORIES.map((category) => {
+            const count = counts.get(category.id) ?? 0;
+            if (count === 0) return null;
+            const isActive = activeCategory === category.id;
+            return (
+              <li key={category.id}>
+                <Link
+                  href={buildHref(1, category.id)}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm font-bold transition-colors ${
+                    isActive
+                      ? "bg-ink text-white"
+                      : "border border-line bg-white text-ink-muted hover:border-line-strong hover:text-ink"
+                  }`}
+                >
+                  {category.label} {count}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold text-ink-muted">
-          전체 {BLOG_ARTICLES.length.toLocaleString("ko-KR")}개 글 · {currentPage}/{totalPages}페이지
+          {activeCategoryInfo
+            ? `${activeCategoryInfo.label} · ${activeCategoryInfo.description}`
+            : "전체 글"}{" "}
+          · {filteredArticles.length.toLocaleString("ko-KR")}개 · {currentPage}/{totalPages}페이지
         </p>
         <Link href="/calculator/부업" className="btn-secondary min-h-11 px-5 text-sm font-bold">
           부업 세금 계산기 보기
@@ -79,15 +147,17 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
       </div>
 
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {visibleArticles.map((a, index) => (
+        {visibleArticles.map((a) => {
+          const category = resolveBlogCategory(a);
+          return (
           <li key={a.slug} className="min-h-full">
             <Link
               href={`/blog/${a.slug}`}
               className="group flex min-h-[280px] flex-col rounded-lg border border-line bg-white p-5 transition-colors duration-200 hover:border-line-strong hover:bg-surface-muted"
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="rounded-md bg-surface-muted px-3 py-1 text-xs font-bold text-ink-muted">
-                  {start + index + 1}
+                <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${category.badgeClass}`}>
+                  {category.label}
                 </span>
                 <span className="text-xs font-semibold text-ink-soft">{a.datePublished}</span>
               </div>
@@ -102,13 +172,23 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
               </span>
             </Link>
           </li>
-        ))}
+          );
+        })}
       </ul>
+
+      {visibleArticles.length === 0 ? (
+        <p className="mt-10 rounded-lg border border-line bg-surface-muted px-5 py-6 text-center text-sm text-ink-muted">
+          이 카테고리에는 아직 글이 없습니다.{" "}
+          <Link href="/blog" className="font-bold text-brand-dark underline underline-offset-4">
+            전체 글 보기
+          </Link>
+        </p>
+      ) : null}
 
       {totalPages > 1 ? (
         <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="블로그 페이지">
           <Link
-            href={pageHref(Math.max(1, currentPage - 1))}
+            href={buildHref(Math.max(1, currentPage - 1), activeCategory)}
             className={`btn-secondary min-h-11 px-5 text-sm font-bold ${
               currentPage === 1 ? "pointer-events-none opacity-45" : ""
             }`}
@@ -119,7 +199,7 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <Link
               key={page}
-              href={pageHref(page)}
+              href={buildHref(page, activeCategory)}
               className={`flex h-11 w-11 items-center justify-center rounded-lg text-sm font-black ${
                 page === currentPage
                   ? "bg-primary text-white"
@@ -131,7 +211,7 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
             </Link>
           ))}
           <Link
-            href={pageHref(Math.min(totalPages, currentPage + 1))}
+            href={buildHref(Math.min(totalPages, currentPage + 1), activeCategory)}
             className={`btn-secondary min-h-11 px-5 text-sm font-bold ${
               currentPage === totalPages ? "pointer-events-none opacity-45" : ""
             }`}

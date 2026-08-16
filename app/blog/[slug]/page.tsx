@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogPostCta } from "@/components/BlogPostCta";
 import { JsonLd } from "@/components/JsonLd";
+import { resolveBlogCategory } from "@/lib/blog/categories";
 import { getAllBlogSlugs, getBlogArticle } from "@/lib/blog/posts";
 import { getBaseUrl, siteName } from "@/lib/seo/site";
 import { absoluteUrl } from "@/lib/seo/urls";
@@ -124,6 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
   const url = absoluteUrl(`/blog/${slug}`);
   const base = getBaseUrl();
   const cta = getBlogCta(article);
+  const category = resolveBlogCategory(article);
 
   const articleJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -166,7 +168,16 @@ export default async function BlogPostPage({ params }: Props) {
           <span className="line-clamp-1 text-neutral-900">{article.h1}</span>
         </nav>
 
-        <h1 className="mt-5 text-3xl font-extrabold leading-tight text-ink sm:text-4xl">
+        <div className="mt-5">
+          <Link
+            href={`/blog?category=${category.id}`}
+            className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold transition-opacity hover:opacity-80 ${category.badgeClass}`}
+          >
+            {category.label}
+          </Link>
+        </div>
+
+        <h1 className="mt-3 text-3xl font-extrabold leading-tight text-ink sm:text-4xl">
           {article.h1}
         </h1>
         <p className="mt-2 text-sm text-neutral-500">
