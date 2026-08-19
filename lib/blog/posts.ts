@@ -3,6 +3,7 @@ import { BLOG_ARTICLES_PART2 } from "@/lib/blog/all-posts-part2";
 import { BLOG_ARTICLES_PART3 } from "@/lib/blog/all-posts-part3";
 import { BLOG_ARTICLES_PART4 } from "@/lib/blog/all-posts-part4";
 import { BLOG_ARTICLES_PART5 } from "@/lib/blog/all-posts-part5";
+import { BLOG_ARTICLES_PART6 } from "@/lib/blog/all-posts-part6";
 import {
   buildLengthPadSection,
   mergeBlogExtra,
@@ -23,6 +24,7 @@ function finalizeArticle(a: BlogArticle): BlogArticle {
  * 새 파트를 추가할 때는 import 후 이 배열 맨 앞에 넣기만 하면 됩니다.
  */
 const ALL_PARTS: BlogArticle[][] = [
+  BLOG_ARTICLES_PART6,
   BLOG_ARTICLES_PART5,
   BLOG_ARTICLES_PART4,
   BLOG_ARTICLES_PART3,
