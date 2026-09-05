@@ -17,12 +17,12 @@
 | /blog/부가세-신고-세무사-직접-판단 | Distinguish filing periods, direct filing vs review vs delegation, hypothetical settlement reconciliation, quote scope and document checklist | NTS VAT overview and filing deadlines checked 2026-09-05 |
 | /blog/프리랜서-3점3-종합소득세-환급-추가납부 | Hypothetical national-tax comparison, separate local tax, gross receipts vs net deposits, payment-record checklist | NTS prefilled refund guidance checked 2026-09-05 |
 
-These are source-backed editorial improvements, not a professional tax certification or an audit of all 33 published articles.
+These are source-backed editorial improvements, not a professional tax certification or an audit of all 51 published articles. The 18 articles from six remote commits were retained during integration.
 
 ## Remaining work, in order
 
 1. Confirm public operator/business name, contact channel and actual professional-review arrangements with the owner. Reconcile the about page, privacy policy and terms with the actual service. Do not invent credentials or publish a provisional identity.
-2. Review the remaining 31 articles individually. Prioritize proposed-versus-enacted law claims, expired deadlines, broad homepage-only sources and unsupported numerical examples. Repair the same URL when the intent is useful; consolidate only genuinely overlapping articles with appropriate redirects.
+2. Review the remaining 49 articles individually. Prioritize proposed-versus-enacted law claims, expired deadlines, broad homepage-only sources and unsupported numerical examples. Repair the same URL when the intent is useful; consolidate only genuinely overlapping articles with appropriate redirects.
 3. Audit calculator explanations and results: assumptions, applicable tax year, exclusions, official source and next action. Passing regression tests does not establish legal accuracy.
 4. Verify consultation and support delivery using an explicitly identified test workflow, without creating unsolicited real leads. Review directory data freshness and avoid implying verified expert partnerships where none exist.
 5. Review mobile navigation, output readability, broken internal links, published metadata and sitemap again after each release.

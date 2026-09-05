@@ -53,3 +53,15 @@ test("global layout preserves analytics and ownership without display ads", () =
   assert.match(footer, /\/editorial-policy/);
   assert.match(footer, /\/about/);
 });
+
+test("remote article batches stay registered and sitemap excludes regional details", () => {
+  const posts = readFileSync(new URL("../lib/blog/posts.ts", import.meta.url), "utf8");
+  for (let part = 6; part <= 11; part++) {
+    assert.match(posts, new RegExp(`import \\{ BLOG_ARTICLES_PART${part} \\}`));
+    assert.match(posts, new RegExp(`^  BLOG_ARTICLES_PART${part},`, "m"));
+  }
+  const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(sitemap, /regionSidoPath|regionSigunguPath|listActiveRegionPairs/);
+  assert.doesNotMatch(sitemap, /new Date\(\)/);
+  assert.match(sitemap, /new Date\(article.dateModified\)/);
+});
