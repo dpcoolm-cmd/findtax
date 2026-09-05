@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AuthFooterControls } from "@/components/AuthFooterControls";
-import { SiteAdFooter } from "@/components/SiteAdZones";
 
 const FOOTER_LINKS = [
   { href: "/region", label: "지역 세무사 찾기" },
@@ -8,12 +7,13 @@ const FOOTER_LINKS = [
   { href: "/blog", label: "세금 가이드" },
   { href: "/consult", label: "상담 신청" },
   { href: "/register", label: "전문가 입점" },
+  { href: "/about", label: "FindTax 소개" },
+  { href: "/editorial-policy", label: "편집·수정 원칙" },
 ] as const;
 
 export function Footer() {
   return (
     <footer className="mt-auto bg-primary text-white">
-      <SiteAdFooter />
       <div className="app-shell-frame py-14">
         <div className="grid gap-12 md:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
           <div className="max-w-xl">

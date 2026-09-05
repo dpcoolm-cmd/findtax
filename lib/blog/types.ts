@@ -1,6 +1,12 @@
 export type BlogSection = {
   h2: string;
   paragraphs: string[];
+  table?: {
+    caption: string;
+    headers: string[];
+    rows: string[][];
+  };
+  checklist?: string[];
 };
 
 export type BlogArticle = {
@@ -20,4 +26,5 @@ export type BlogArticle = {
   datePublished: string;
   dateModified: string;
   sources?: { title: string; url: string; checkedAt: string }[];
+  revisionNote?: string;
 };

@@ -3,8 +3,6 @@ import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import CoupangRecommendBanner from "@/components/monetization/CoupangRecommendBanner";
-import { SiteAdMid, SiteAdTop } from "@/components/SiteAdZones";
 import { getBaseUrl, siteDescription, siteName } from "@/lib/seo/site";
 import "./globals.css";
 
@@ -111,15 +109,6 @@ gtag('config', '${googleTagId}', { send_page_view: false });
             />
           </>
         ) : null}
-        {adsenseClient ? (
-          <Script
-            id="adsense-init"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        ) : null}
         <Script
           id="udeuk-track-loader"
           strategy="afterInteractive"
@@ -141,14 +130,11 @@ gtag('config', '${googleTagId}', { send_page_view: false });
         />
         <AppShell>
           <Header />
-          <main className="flex-1 pb-[calc(130px+env(safe-area-inset-bottom))] pt-[104px]">
-            <SiteAdTop />
+          <main className="flex-1 pt-[104px]">
             {children}
-            <SiteAdMid />
           </main>
           <Footer />
         </AppShell>
-        <CoupangRecommendBanner />
       </body>
     </html>
   );

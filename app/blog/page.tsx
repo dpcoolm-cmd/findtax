@@ -91,8 +91,8 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
           </h1>
         </div>
         <p className="max-w-md text-base leading-7 text-ink-muted">
-          부업, 구매대행, 역직구, 종합소득세, 부가세처럼 실무에서 바로 막히는 주제를
-          카드 형태로 정리했습니다.
+          부업부터 구매대행·역직구까지, 신고 대상과 준비자료를 확인하고
+          직접 할 일과 검토가 필요한 일을 구분하세요.
         </p>
       </section>
 

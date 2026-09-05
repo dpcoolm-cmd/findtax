@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "test": "node --test tests/calculator-safety.test.ts",
+    "test": "node --test tests/calculator-safety.test.ts tests/content-quality.test.ts",
+    "typecheck": "tsc --noEmit",
     "start": "next start",
     "lint": "next lint"
   },

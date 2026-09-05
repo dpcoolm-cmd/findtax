@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
+  BookOpen,
   Calculator,
   CheckCircle2,
   ChevronRight,
@@ -15,6 +16,7 @@ import { FaqSection, InternalLinksSection } from "@/components/SeoBlocks";
 import { JsonLd } from "@/components/JsonLd";
 import { LeadSectionTrigger } from "@/components/LeadSectionTrigger";
 import { TaxDecisionWidget } from "@/components/TaxDecisionWidget";
+import { getBlogArticle } from "@/lib/blog/posts";
 import { buildMainFaq, faqJsonLd } from "@/lib/seo/auto-content";
 import { SIDO_NAMES } from "@/lib/regions";
 import { absoluteUrl, calculatorPath, regionSidoPath, situationPath } from "@/lib/seo/urls";
@@ -36,37 +38,25 @@ export const metadata: Metadata = {
   },
 };
 
-const STEPS = [
-  {
-    number: "01",
-    title: "상황을 선택하세요",
-    description: "양도, 소득, 상속·증여, 기장처럼 지금 필요한 세금 문제를 고릅니다.",
-  },
-  {
-    number: "02",
-    title: "내 운영표로 저장하세요",
-    description: "예상 세액, 준비자료와 다음 신고 일정을 한 곳에 모읍니다.",
-  },
-  {
-    number: "03",
-    title: "기한 전에 알림을 받으세요",
-    description: "남은 할 일을 이어서 확인하고 신고 전 다시 점검합니다.",
-  },
-  {
-    number: "04",
-    title: "필요할 때만 연결하세요",
-    description: "정리된 진단 인계서와 함께 세무사에게 마지막 판단을 확인합니다.",
-  },
+const STARTER_GUIDES = [
+  { slug: "부가세-신고-세무사-직접-판단", audience: "1인사업자·온라인 셀러", summary: "직접 신고, 1회 검토, 신고 대행. 내 자료 상태에 맞춰 선택하세요." },
+  { slug: "프리랜서-3점3-종합소득세-환급-추가납부", audience: "프리랜서·부업", summary: "이미 뗀 세금과 최종 세금은 다릅니다. 환급·추가 납부를 가르는 자료를 확인하세요." },
 ] as const;
 
 function mainInternalLinks() {
   return [
-    { href: regionSidoPath("서울특별시"), label: "서울특별시 세무사 찾기" },
-    { href: regionSidoPath("경기도"), label: "경기도 세무사 찾기" },
-    { href: situationPath("income_tax"), label: "종합소득세 상황별 가이드" },
-    { href: situationPath("corporate_tax"), label: "법인세 상황별 가이드" },
-    { href: calculatorPath("양도세"), label: "양도세 계산기" },
-    { href: "/consult", label: "세무 상담 신청" },
+    { href: "/blog/개인사업자-세금-완벽정리", label: "개인사업자 세금 한 번에 정리" },
+    {
+      href: "/blog/구매대행-셀러-부가세-종합소득세",
+      label: "구매대행 셀러 부가세·종합소득세",
+    },
+    {
+      href: "/blog/부가세-신고-세무사-직접-판단",
+      label: "부가세 신고, 직접 할지 맡길지 판단",
+    },
+    { href: calculatorPath("1인사업자"), label: "1인사업자 세금 운영표" },
+    { href: calculatorPath("부업"), label: "N잡·부업 세금 계산기" },
+    { href: situationPath("income_tax"), label: "종합소득세·연금 절세 판단" },
   ];
 }
 
@@ -136,46 +126,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CalculatorDirectory
-        title="상담 전에, 숫자부터 확인하세요."
-        description="계산기 메뉴를 한 곳으로 모았습니다. 자주 쓰는 양도세·종합소득세·기장료·상속증여는 추천 항목으로 먼저 볼 수 있습니다."
-      />
-
-      <section className="bg-white">
+      <section className="border-y border-line bg-white" aria-labelledby="starter-guides-title">
         <div className="app-shell-frame app-section">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
-          <div className="lg:sticky lg:top-28">
-            <p className="text-sm font-bold text-brand-dark">이용 방법</p>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight md:text-4xl">
-              계산하고,
-              <br />
-              판단하고,
-              <br />
-              확인하세요.
-            </h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-ink-muted">
-              세무 상담을 받기 전에 핵심 정보를 정리하면 더 빠르고 구체적인 답을 얻을 수
-              있습니다.
-            </p>
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <p className="flex items-center gap-2 text-sm font-bold text-brand-dark"><BookOpen size={18} />신고 전 읽어볼 가이드</p>
+              <h2 id="starter-guides-title" className="mt-3 text-3xl font-extrabold text-ink">내 상황에 맞는 판단부터.</h2>
+            </div>
+            <Link href="/blog" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-ink underline underline-offset-4">전체 가이드<ArrowRight size={18} /></Link>
           </div>
-
-          <div className="space-y-3">
-            {STEPS.map((step) => (
-              <div
-                key={step.number}
-                className="grid gap-5 rounded-lg border border-line bg-surface-muted p-6 transition-colors hover:border-line-strong sm:grid-cols-[72px_minmax(0,1fr)] sm:p-8"
-              >
-                <span className="text-4xl font-black text-brand-dark leading-none">{step.number}</span>
-                <div>
-                  <h3 className="text-2xl font-bold text-ink">{step.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-ink-muted">{step.description}</p>
-                </div>
-              </div>
-            ))}
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {STARTER_GUIDES.map((guide) => {
+              const article = getBlogArticle(guide.slug);
+              if (!article) throw new Error(`Missing starter guide: ${guide.slug}`);
+              return (
+                <Link key={guide.slug} href={`/blog/${guide.slug}`} className="group flex flex-col rounded-lg border border-line p-6 transition-colors hover:border-line-strong hover:bg-surface-muted">
+                  <p className="text-sm font-semibold text-brand-dark">{guide.audience}</p>
+                  <h3 className="mt-4 text-xl font-bold leading-snug text-ink">{article.h1}</h3>
+                  <p className="mt-3 text-base leading-7 text-ink-muted">{guide.summary}</p>
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6 text-sm">
+                    <time dateTime={article.dateModified} className="text-neutral-600">수정 {article.dateModified}</time>
+                    <span className="inline-flex items-center gap-2 font-bold text-ink">가이드 읽기<ArrowRight size={17} /></span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        </div>
         </div>
       </section>
+
+      <CalculatorDirectory
+        title="내 숫자로 확인해 보세요."
+        description="예상 세액과 신고 준비 상태를 확인하고, 판단이 어려운 항목은 상담 전에 정리하세요."
+      />
 
       <section className="bg-bg">
         <div className="app-shell-frame app-section">

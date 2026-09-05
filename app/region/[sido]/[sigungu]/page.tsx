@@ -37,7 +37,6 @@ export async function generateMetadata({
   const { sido: rs, sigungu: rg } = await params;
   const sido = decodeURIComponent(rs);
   const sigungu = decodeURIComponent(rg);
-  const result = await listTaxAccountants({ sido, sigungu, limit: 1 });
   const path = regionSigunguPath(sido, sigungu);
   const canonical = absoluteUrl(path);
   const desc = `${sido} ${sigungu} 지역 세무사 목록과 상담 요청 정보를 확인할 수 있습니다.`;
@@ -46,7 +45,7 @@ export async function generateMetadata({
     title: `${sido} ${sigungu} 세무사 찾기`,
     description: desc,
     alternates: { canonical },
-    robots: { index: !result.isEmpty, follow: true },
+    robots: { index: false, follow: true },
     openGraph: {
       url: canonical,
       title: `${sido} ${sigungu} 세무사 찾기`,

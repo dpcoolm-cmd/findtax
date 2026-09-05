@@ -31,8 +31,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { sido: raw } = await params;
   const sido = decodeURIComponent(raw);
-  const activeRows = await listActiveRegionPairs();
-  const hasActiveDistrict = activeRows.some((row) => row.sido === sido);
   const path = regionSidoPath(sido);
   const canonical = absoluteUrl(path);
   const desc = `${sido} 지역 세무사 목록과 무료 상담 연결 정보를 확인할 수 있습니다.`;
@@ -41,7 +39,7 @@ export async function generateMetadata({
     title: `${sido} 세무사 찾기`,
     description: desc,
     alternates: { canonical },
-    robots: { index: hasActiveDistrict, follow: true },
+    robots: { index: false, follow: true },
     openGraph: {
       url: canonical,
       title: `${sido} 세무사 찾기`,

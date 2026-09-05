@@ -3,18 +3,11 @@ import { BLOG_ARTICLES_PART2 } from "@/lib/blog/all-posts-part2";
 import { BLOG_ARTICLES_PART3 } from "@/lib/blog/all-posts-part3";
 import { BLOG_ARTICLES_PART4 } from "@/lib/blog/all-posts-part4";
 import { BLOG_ARTICLES_PART5 } from "@/lib/blog/all-posts-part5";
-import {
-  buildLengthPadSection,
-  mergeBlogExtra,
-} from "@/lib/blog/extra-body";
+import { mergeBlogExtra } from "@/lib/blog/extra-body";
 import type { BlogArticle } from "@/lib/blog/types";
 
 function finalizeArticle(a: BlogArticle): BlogArticle {
-  let m = mergeBlogExtra(a);
-  if (countBlogBodyChars(m) < 1500) {
-    m = { ...m, sections: [...m.sections, buildLengthPadSection(a.slug)] };
-  }
-  return m;
+  return mergeBlogExtra(a);
 }
 
 /**
@@ -59,7 +52,10 @@ export function getAllBlogSlugs(): string[] {
 export function countBlogBodyChars(article: BlogArticle): number {
   const parts = [
     article.intro,
-    ...article.sections.flatMap((s) => [s.h2, ...s.paragraphs]),
+    ...article.sections.flatMap((s) => [
+      s.h2, ...s.paragraphs, ...(s.checklist ?? []),
+      ...(s.table ? [s.table.caption, ...s.table.headers, ...s.table.rows.flat()] : []),
+    ]),
     article.closing,
   ];
   return parts.join("\n").length;

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description:
     "findtax.kr 세무사 자가등록 및 STANDARD·PREMIUM 노출 플랜 안내. 무료 기본 등록부터 상담 연결까지.",
   alternates: { canonical: absoluteUrl("/register") },
+  robots: { index: false, follow: true },
 };
 
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
