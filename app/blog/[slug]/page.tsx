@@ -13,6 +13,10 @@ type Props = { params: Promise<{ slug: string }> };
 function getBlogCta(article: { slug: string; h1: string; keywords: string[] }) {
   const text = `${article.slug} ${article.h1} ${article.keywords.join(" ")}`;
 
+  if (["연금저축계좌-세액공제-입문", "연금저축-irp-etf-구성-초보"].includes(article.slug)) {
+    return { title: "모은 연금, 월급으로 몇 년 쓸 수 있을까요?", description: "국민연금 수령 전 공백과 물가를 반영해 노후 부족생활비를 계산합니다.", href: "/calculator/retirement-income", calculatorType: "retirement_income" };
+  }
+
   if (text.includes("기장")) {
     return {
       title: "기장료가 적정한지 먼저 비교해 보세요",
@@ -286,6 +290,7 @@ export default async function BlogPostPage({ params }: Props) {
           description={cta.description}
           href={cta.href}
           calculatorType={cta.calculatorType}
+          {...(cta.calculatorType === "retirement_income" ? { secondaryHref: "/calculator/연말정산", secondaryLabel: "연금·IRP 절세 확인" } : {})}
         />
       </article>
       </div>

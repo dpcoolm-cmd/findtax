@@ -83,6 +83,9 @@ export default function HomePage() {
             <p className="mt-7 max-w-2xl text-lg leading-8 text-ink-muted md:text-xl">
               구매대행·역직구까지, 내 세금과 다음 할 일을 한 번에.
             </p>
+            <Link href="/calculator/retirement-income" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-ink underline underline-offset-4">
+              직장인의 퇴직·노후월급도 계산하세요<ArrowRight size={16} />
+            </Link>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={calculatorPath("1인사업자")}

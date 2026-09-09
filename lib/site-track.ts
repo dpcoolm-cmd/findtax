@@ -13,6 +13,7 @@ const GA_ALLOWED_KEYS = new Set([
   "campaign",
   "device",
   "calculatorType",
+  "calculator_type",
   "resultBand",
   "recommendation",
   "score",

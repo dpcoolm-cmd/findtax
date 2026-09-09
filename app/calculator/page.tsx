@@ -7,9 +7,9 @@ import { absoluteUrl } from "@/lib/seo/urls";
 
 export const revalidate = 86400;
 
-const title = "세금 계산기 전체 목록";
+const title = "세금·연금 계산기 전체 목록";
 const description =
-  "양도세, 종합소득세, 기장료, 상속·증여, 부가세, 취득세, 퇴직금, 4대보험 등 FindTax 계산기를 한 곳에서 선택하세요.";
+  "사업·부업, 부동산, 상속·증여, 근로, 연금·재무 계산기를 한 곳에서 선택하세요. 노후월급과 연금·IRP 절세까지 내 조건으로 비교합니다.";
 
 export const metadata: Metadata = {
   title,
@@ -37,7 +37,7 @@ export default function CalculatorHubPage() {
         <div className="app-shell-frame py-10 md:py-14">
           <p className="text-sm font-bold text-brand-dark">전체 계산기</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">
-            필요한 세금 계산기를 한 곳에서 찾으세요.
+            세금부터 연금까지, 내 숫자로 비교하세요.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-ink-muted">
             많이 찾는 계산기를 먼저 표시했습니다. 목적에 맞는 계산기를 선택해 바로 결과를

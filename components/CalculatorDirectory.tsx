@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { ArrowRight, Calculator, Star } from "lucide-react";
-import { CALCULATOR_DIRECTORY } from "@/lib/seo/calculators";
+import { CALCULATOR_DIRECTORY, CALCULATOR_GROUPS, calculatorGroup } from "@/lib/seo/calculators";
 
 export function CalculatorDirectory({
   title = "필요한 계산기를 한 곳에서 선택하세요.",
@@ -11,13 +14,15 @@ export function CalculatorDirectory({
   description?: string;
   dark?: boolean;
 }) {
+  const [group, setGroup] = useState("전체");
+  const items = CALCULATOR_DIRECTORY.filter(item => group === "전체" || calculatorGroup(item) === group);
   return (
     <section id="calculators" className={dark ? "bg-primary text-white" : "bg-white"}>
       <div className="app-shell-frame app-section">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(320px,0.45fr)] lg:items-end">
           <div>
             <p className={dark ? "text-sm font-bold text-brand" : "text-sm font-bold text-brand-dark"}>
-              세금 계산기
+              세금·연금 계산기
             </p>
             <h2 className={`mt-3 max-w-4xl text-3xl font-extrabold leading-tight md:text-4xl ${dark ? "text-white" : "text-ink"}`}>
               {title}
@@ -28,8 +33,13 @@ export function CalculatorDirectory({
           </p>
         </div>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {CALCULATOR_DIRECTORY.map((item) => (
+        <div role="group" aria-label="계산기 분야" className="mt-8 flex flex-wrap gap-2">
+          {["전체", ...CALCULATOR_GROUPS].map(label => <button key={label} type="button" aria-pressed={group === label} onClick={() => setGroup(label)}
+            className={`min-h-11 rounded-lg border px-4 py-2 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${group === label ? "border-primary bg-primary text-white" : "border-line bg-white text-ink"}`}>{label}</button>)}
+        </div>
+        <p aria-live="polite" className={`mt-4 text-sm ${dark ? "text-white/80" : "text-ink-muted"}`}>{group} · {items.length}개</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
             <Link
               key={item.key}
               href={item.href}

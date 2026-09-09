@@ -140,13 +140,13 @@ export function Header() {
               aria-expanded={calculatorOpen}
               onClick={openCalculatorMenu}
             >
-              세금 계산기
+              계산기
               <ChevronDown size={15} className={calculatorOpen ? "rotate-180 transition-transform" : "transition-transform"} />
             </button>
 
             {calculatorOpen ? (
               <div className="absolute left-1/2 top-full z-50 w-[720px] -translate-x-1/2 pt-3">
-              <div className="rounded-lg border border-line bg-white p-4 shadow-card">
+              <div className="max-h-[calc(100dvh-130px)] overflow-y-auto rounded-lg border border-line bg-white p-4 shadow-card">
                 <div className="flex items-center justify-between border-b border-line pb-3">
                   <Link
                     href="/calculator"
@@ -210,7 +210,7 @@ export function Header() {
 
       {menuOpen ? (
         <div className="fixed inset-0 top-[105px] z-50 bg-white lg:hidden" id="mobile-nav">
-          <nav className="app-shell-frame flex h-full flex-col py-6" aria-label="모바일 메뉴">
+          <nav className="app-shell-frame flex h-full flex-col overflow-y-auto py-6" aria-label="모바일 메뉴">
             <div className="flex flex-col gap-1">
               <Link
                 href="/calculator"
@@ -219,7 +219,7 @@ export function Header() {
                   calculatorActive ? "bg-bg-muted text-ink" : "text-ink-muted hover:bg-bg-muted hover:text-ink"
                 }`}
               >
-                세금 계산기
+                계산기
               </Link>
               <div className="grid grid-cols-2 gap-2 pb-3 pl-3 pt-1">
                 {CALCULATOR_DIRECTORY.map((item) => (

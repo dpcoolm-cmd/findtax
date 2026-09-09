@@ -138,6 +138,23 @@ export const CALCULATOR_DIRECTORY: CalculatorDirectoryItem[] = [
     shortTitle: "연말정산",
     description: "연금저축·IRP 납입에 따른 절세 가능 금액을 비교합니다.",
     href: "/calculator/%EC%97%B0%EB%A7%90%EC%A0%95%EC%82%B0",
-    category: "절세",
+    category: "연금·재무",
+  },
+  {
+    key: "retirement-income",
+    title: "노후월급 계산기",
+    shortTitle: "노후월급",
+    description: "퇴직연금·국민연금으로 부족생활비를 몇 년 채울 수 있을지 비교합니다.",
+    href: "/calculator/retirement-income",
+    category: "연금·재무",
   },
 ];
+
+export const CALCULATOR_GROUPS = ["사업·부업", "부동산", "상속·증여", "근로", "연금·재무"] as const;
+export function calculatorGroup(item: CalculatorDirectoryItem): typeof CALCULATOR_GROUPS[number] {
+  if (["year-end-tax", "retirement-income"].includes(item.key)) return "연금·재무";
+  if (["inheritance-gift", "gift-tax"].includes(item.key)) return "상속·증여";
+  if (["severance-pay", "social-insurance", "weekly-holiday-pay"].includes(item.key)) return "근로";
+  if (["transfer-tax", "acquisition-tax"].includes(item.key)) return "부동산";
+  return "사업·부업";
+}

@@ -374,3 +374,13 @@ pre, code, .font-mono {
   margin: 0;
   overflow: hidden;
 }
+
+@media print {
+  body:has(.retirement-page) header,
+  body:has(.retirement-page) footer,
+  .retirement-page nav { display: none !important; }
+  body:has(.retirement-page) main { padding-top: 0 !important; }
+  .retirement-page { background: white; color: black; padding: 0; }
+  .retirement-page h2, .retirement-page h3 { break-after: avoid; }
+  .retirement-page dl > div { break-inside: avoid; }
+}

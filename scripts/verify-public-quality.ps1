@@ -29,12 +29,12 @@ $publishedBlogs = @($paths | Where-Object { $_.StartsWith('/blog/') } | Sort-Obj
 $difference = @(Compare-Object $expectedBlogs $publishedBlogs)
 if ($difference.Count) { throw "Blog URL mismatch: $($difference | ConvertTo-Json -Compress)" }
 
-$home = (Get-PublicPage "$base/").Content
-if ($home -notmatch 'id="starter-guides-title"') { throw 'New home guide section is missing.' }
-if ($home -match 'ads-partners\.coupang\.com|adsbygoogle\.js|class="adsbygoogle') {
+$homeHtml = (Get-PublicPage "$base/").Content
+if ($homeHtml -notmatch 'id="starter-guides-title"') { throw 'New home guide section is missing.' }
+if ($homeHtml -match 'ads-partners\.coupang\.com|adsbygoogle\.js|class="adsbygoogle') {
   throw 'Global display advertising is still present.'
 }
-if ($home -notmatch 'google-adsense-account') { throw 'AdSense ownership metadata is missing.' }
+if ($homeHtml -notmatch 'google-adsense-account') { throw 'AdSense ownership metadata is missing.' }
 
 $checkedBlogs = 0
 foreach ($entry in $entries) {
@@ -58,10 +58,25 @@ foreach ($entry in $entries) {
   $checkedBlogs++
 }
 
-$corePaths = @('/calculator', '/consult', '/about', '/editorial-policy', '/privacy', '/terms', '/support')
+$corePaths = @('/calculator', '/calculator/retirement-income', '/consult', '/about', '/editorial-policy', '/privacy', '/terms', '/support')
 foreach ($path in $corePaths) { $null = Get-PublicPage "$base$path" }
+$retirementEntry = @($entries | Where-Object {
+  [Uri]::UnescapeDataString(([Uri]$_.loc).AbsolutePath) -eq '/calculator/retirement-income'
+})
+if ($retirementEntry.Count -ne 1) { throw 'Retirement calculator must appear exactly once in sitemap.' }
+$retirementHtml = (Get-PublicPage "$base/calculator/retirement-income").Content
+if ($retirementHtml -notmatch '노후월급 계산기' -or $retirementHtml -notmatch 'WebApplication') {
+  throw 'Retirement calculator content or structured data is missing.'
+}
 $robots = (Get-PublicPage "$base/robots.txt").Content
-if ($robots -notmatch 'Sitemap:\s*https://findtax.kr/sitemap.xml') { throw 'Sitemap declaration missing.' }
+$sitemapDeclaration = [regex]::Match($robots, '(?m)^Sitemap:\s*(\S+)\s*$')
+if (-not $sitemapDeclaration.Success) { throw 'Sitemap declaration missing.' }
+$declaredSitemap = [Uri]$sitemapDeclaration.Groups[1].Value
+if ($declaredSitemap.AbsolutePath -ne '/sitemap.xml') { throw 'Sitemap declaration points to an unexpected path.' }
+$baseUri = [Uri]$base
+if (-not $baseUri.IsLoopback -and $declaredSitemap.Host -ne $baseUri.Host) {
+  throw 'Sitemap declaration points to a different production host.'
+}
 $ads = (Get-PublicPage "$base/ads.txt").Content
 if ($ads -notmatch 'pub-8715120205322652') { throw 'Publisher entry missing from ads.txt.' }
 

@@ -27,6 +27,13 @@ const OPTIONS = [
     href: calculatorPath("증여세"),
     cta: "증여 계획 확인하기",
   },
+  {
+    id: "retirement",
+    label: "직장인·퇴직 준비가 궁금해요",
+    description: "국민연금과 모은 자산으로 노후 생활비를 얼마나 채울지 비교합니다.",
+    href: "/calculator/retirement-income",
+    cta: "내 노후월급 계산하기",
+  },
 ] as const;
 
 export function TaxDecisionWidget() {
@@ -54,6 +61,16 @@ export function TaxDecisionWidget() {
               type="button"
               role="radio"
               aria-checked={active}
+              tabIndex={active ? 0 : -1}
+              onKeyDown={(event) => {
+                const direction = ["ArrowRight", "ArrowDown"].includes(event.key) ? 1 : ["ArrowLeft", "ArrowUp"].includes(event.key) ? -1 : 0;
+                if (!direction) return;
+                event.preventDefault();
+                const next = (OPTIONS.findIndex(o => o.id === selected) + direction + OPTIONS.length) % OPTIONS.length;
+                setSelected(OPTIONS[next].id);
+                const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+                buttons?.[next]?.focus();
+              }}
               onClick={() => setSelected(option.id)}
               className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
                 active
