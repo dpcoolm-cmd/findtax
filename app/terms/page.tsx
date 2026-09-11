@@ -77,7 +77,8 @@ export default function TermsPage() {
           <SectionLabel>legal_document</SectionLabel>
           <h1 className="max-w-4xl text-[3.5rem] leading-[0.95] md:text-[4.75rem]">이용약관</h1>
           <p className="max-w-3xl">
-            아래 약관은 findtax.kr의 일반적인 서비스 운영 구조를 기준으로 작성된 기본 약관입니다. 실제 운영 형태에 따라 세부 조정이나 법률 검토가 필요할 수 있습니다.
+            FindTax의 계산기, 세금 정보와 전문가 연결 기능을 이용할 때 적용되는 기준입니다.
+            시행일은 2026년 9월 11일입니다.
           </p>
         </section>
 

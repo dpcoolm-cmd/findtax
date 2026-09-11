@@ -65,3 +65,23 @@ test("remote article batches stay registered and sitemap excludes regional detai
   assert.doesNotMatch(sitemap, /new Date\(\)/);
   assert.match(sitemap, /new Date\(article.dateModified\)/);
 });
+
+test("public blog surfaces only publish source-reviewed articles", () => {
+  const posts = readFileSync(new URL("../lib/blog/posts.ts", import.meta.url), "utf8");
+  const page = readFileSync(new URL("../app/blog/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.match(posts, /BLOG_ARTICLES: BlogArticle\[\] = ALL_BLOG_ARTICLES\.filter\(isEditoriallyVerifiedArticle\)/);
+  assert.match(posts, /const bySlug = new Map\(ALL_BLOG_ARTICLES/);
+  assert.match(posts, /article\.sources\?\.length/);
+  assert.match(posts, /new URL\(source\.url\)\.protocol === "https:"/);
+  assert.match(page, /isEditoriallyVerifiedArticle/);
+  assert.match(page, /index: false, follow: true/);
+});
+
+test("public trust pages do not present themselves as unfinished templates", () => {
+  const privacy = readFileSync(new URL("../app/privacy/page.tsx", import.meta.url), "utf8");
+  const terms = readFileSync(new URL("../app/terms/page.tsx", import.meta.url), "utf8");
+  const about = readFileSync(new URL("../app/about/page.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(`${privacy}\n${terms}`, /기본 개인정보처리방침|작성된 기본 약관|최종 점검이 필요/);
+  assert.match(about, /누가 운영하나요/);
+  assert.match(about, /세무법인이나 세무대리인이 아니며/);
+});

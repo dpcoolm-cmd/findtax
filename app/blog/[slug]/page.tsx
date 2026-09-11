@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { BlogPostCta } from "@/components/BlogPostCta";
 import { JsonLd } from "@/components/JsonLd";
 import { resolveBlogCategory } from "@/lib/blog/categories";
-import { getAllBlogSlugs, getBlogArticle } from "@/lib/blog/posts";
+import { getAllBlogSlugs, getBlogArticle, isEditoriallyVerifiedArticle } from "@/lib/blog/posts";
 import { getBaseUrl, siteName } from "@/lib/seo/site";
 import { absoluteUrl } from "@/lib/seo/urls";
 
@@ -108,7 +108,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: article.metaDescription,
     keywords: article.keywords,
     alternates: { canonical: url },
-    robots: { index: true, follow: true },
+    robots: isEditoriallyVerifiedArticle(article)
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
     openGraph: {
       url,
       title: cleanTitle,
@@ -190,9 +192,15 @@ export default async function BlogPostPage({ params }: Props) {
           {" · 수정 "}<time dateTime={article.dateModified}>{article.dateModified}</time>
           {" · 작성: "}
           <Link href="/about" rel="author" className="underline underline-offset-4">
-            FindTax
+            FindTax 편집팀
           </Link>
         </p>
+        <div className="mt-4 border-l-2 border-brand-dark pl-4 text-sm leading-6 text-neutral-600">
+          <p>작성·편집: FindTax 편집팀</p>
+          <p>
+            검토 범위: 아래 표시된 원자료의 요건·기한·수치를 대조했습니다. 세무사의 개별 검수나 자문을 뜻하지 않습니다.
+          </p>
+        </div>
         {article.revisionNote ? (
           <p className="mt-3 text-sm leading-6 text-neutral-600">이번 수정: {article.revisionNote}</p>
         ) : null}

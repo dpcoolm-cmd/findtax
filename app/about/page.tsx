@@ -18,10 +18,25 @@ export default function AboutPage() {
           언제 전문가 검토가 필요한지를 먼저 판단할 수 있도록 계산기와 실전 가이드를 제공합니다.
         </p>
         <section>
+          <h2 className="text-2xl font-bold text-ink">누가 운영하나요?</h2>
+          <p className="mt-3">
+            FindTax 운영팀이 서비스를 관리하고, FindTax 편집팀이 콘텐츠를 작성·수정합니다.
+            FindTax는 세무법인이나 세무대리인이 아니며 개별 신고를 확정하지 않습니다. 작성자 표기가 필요한 글에는
+            편집 주체를 밝히고, 세무사 검수가 없는 콘텐츠를 검수 완료로 표시하지 않습니다.
+          </p>
+          <p className="mt-3">
+            운영·콘텐츠 문의와 오류 제보는 <Link href="/support" className="font-semibold text-brand underline">고객지원</Link>에서 접수합니다.
+          </p>
+        </section>
+        <section>
           <h2 className="text-2xl font-bold text-ink">콘텐츠는 이렇게 만듭니다</h2>
           <p className="mt-3">
             FindTax 편집팀은 국세청, 국가법령정보, 금융위원회 등 공개된 1차 자료를 우선 확인합니다.
             변경 가능성이 큰 신고기한·공제한도·세율은 확인일을 함께 표시하고, 개인별 결론이 달라지는 내용은 단정하지 않습니다.
+          </p>
+          <p className="mt-3">
+            원자료 주소와 확인일을 공개할 수 없는 글은 공개 목록과 사이트맵에 포함하지 않습니다.
+            계산기는 적용 기준과 계산 가정, 반영하지 못한 항목을 결과 화면에 함께 표시합니다.
           </p>
         </section>
         <section>
