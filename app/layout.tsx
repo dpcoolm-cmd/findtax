@@ -129,8 +129,9 @@ gtag('config', '${googleTagId}', { send_page_view: false });
           }}
         />
         <AppShell>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:p-4 focus:text-ink">본문 바로가기</a>
           <Header />
-          <main className="flex-1 pt-[104px]">
+          <main id="main-content" tabIndex={-1} className="flex-1 pt-[104px]">
             {children}
           </main>
           <Footer />

@@ -1,236 +1,105 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ArrowRight,
-  BookOpen,
-  Calculator,
-  CheckCircle2,
-  ChevronRight,
-  MapPin,
-  PhoneCall,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
-import { CalculatorDirectory } from "@/components/CalculatorDirectory";
-import { FaqSection, InternalLinksSection } from "@/components/SeoBlocks";
+import { ArrowRight, BookOpen, Calculator, ChevronDown, MapPin } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
-import { LeadSectionTrigger } from "@/components/LeadSectionTrigger";
 import { TaxDecisionWidget } from "@/components/TaxDecisionWidget";
 import { getBlogArticle } from "@/lib/blog/posts";
-import { buildMainFaq, faqJsonLd } from "@/lib/seo/auto-content";
-import { SIDO_NAMES } from "@/lib/regions";
-import { absoluteUrl, calculatorPath, regionSidoPath, situationPath } from "@/lib/seo/urls";
+import { faqJsonLd } from "@/lib/seo/auto-content";
+import { absoluteUrl } from "@/lib/seo/urls";
 
 export const revalidate = 3600;
-
-const description =
-  "1인사업자·부업러·온라인·글로벌 셀러가 세금과 신고 일정을 확인하고, 필요할 때 세무사에게 상담할 수 있는 FindTax입니다.";
-
+const description = "1인사업자·부업러·온라인·글로벌 셀러가 세금과 신고 일정을 확인하고, 필요할 때 세무사에게 상담할 수 있는 FindTax입니다.";
 export const metadata: Metadata = {
   title: "FindTax | 사업과 판매의 세금, 다음 할 일까지",
   description,
   alternates: { canonical: absoluteUrl("/") },
   robots: { index: true, follow: true },
-  openGraph: {
-    url: absoluteUrl("/"),
-    title: "FindTax | 사업과 판매의 세금, 다음 할 일까지",
-    description,
-  },
+  openGraph: { url: absoluteUrl("/"), title: "FindTax | 사업과 판매의 세금, 다음 할 일까지", description },
 };
 
 const STARTER_GUIDES = [
-  { slug: "부가세-신고-세무사-직접-판단", audience: "1인사업자·온라인 셀러", summary: "직접 신고, 1회 검토, 신고 대행. 내 자료 상태에 맞춰 선택하세요." },
-  { slug: "프리랜서-3점3-종합소득세-환급-추가납부", audience: "프리랜서·부업", summary: "이미 뗀 세금과 최종 세금은 다릅니다. 환급·추가 납부를 가르는 자료를 확인하세요." },
+  { slug: "부가세-신고-세무사-직접-판단", audience: "사업자·셀러", summary: "직접 신고와 세무사 의뢰, 자료 상태에 맞춰 판단하기." },
+  { slug: "프리랜서-3점3-종합소득세-환급-추가납부", audience: "프리랜서·부업", summary: "이미 뗀 3.3%와 최종 세금이 다른 이유 알아보기." },
 ] as const;
-
-function mainInternalLinks() {
-  return [
-    { href: "/blog/개인사업자-세금-완벽정리", label: "개인사업자 세금 한 번에 정리" },
-    {
-      href: "/blog/구매대행-셀러-부가세-종합소득세",
-      label: "구매대행 셀러 부가세·종합소득세",
-    },
-    {
-      href: "/blog/부가세-신고-세무사-직접-판단",
-      label: "부가세 신고, 직접 할지 맡길지 판단",
-    },
-    { href: calculatorPath("1인사업자"), label: "1인사업자 세금 운영표" },
-    { href: calculatorPath("부업"), label: "N잡·부업 세금 계산기" },
-    { href: situationPath("income_tax"), label: "종합소득세·연금 절세 판단" },
-  ];
-}
+const FAQS = [
+  { question: "회원가입 없이 이용할 수 있나요?", answer: "계산기와 가이드는 회원가입 없이 이용할 수 있습니다. 세금 운영표 저장과 이어보기 등 일부 기능은 로그인 또는 저장 링크가 필요합니다." },
+  { question: "계산 결과로 바로 신고해도 되나요?", answer: "계산 결과는 입력한 조건에 따른 참고용 추정치입니다. 공제·예외·신고연도에 따라 실제 세액이 달라질 수 있으므로 해당 계산기의 적용 범위와 공식 자료를 확인하세요." },
+  { question: "상담 신청과 세무 대행은 어떻게 다른가요?", answer: "상담 신청은 세무사 연결을 요청하는 단계입니다. 상담이나 신고 대행의 비용·범위는 담당 세무사에게 확인한 뒤 결정하세요. 신청만으로 유료 계약이 체결되지는 않습니다." },
+];
 
 export default function HomePage() {
-  const faqs = buildMainFaq();
-  const url = absoluteUrl("/");
-
   return (
-    <>
-      <JsonLd data={faqJsonLd(faqs, url)} />
-
-      <section className="bg-bg">
-        <div className="app-shell-frame grid gap-10 py-14 lg:min-h-[540px] lg:grid-cols-[minmax(0,1.05fr)_minmax(380px,0.72fr)] lg:items-center lg:py-16">
-          <div className="max-w-3xl">
-            <div className="badge-neutral gap-2">
-              <Sparkles size={14} className="text-brand-dark" />
-              1인사업자 · 부업러 · 온라인 · 글로벌 셀러
-            </div>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.12] text-ink sm:text-5xl">
-              사업과 판매에서 생기는 세금,
-              <br />
-              해야 할 일까지 정리해 드립니다.
-            </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-ink-muted md:text-xl">
-              구매대행·역직구까지, 내 세금과 다음 할 일을 한 번에.
-            </p>
-            <Link href="/calculator/retirement-income" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-ink underline underline-offset-4">
-              직장인의 퇴직·노후월급도 계산하세요<ArrowRight size={16} />
-            </Link>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={calculatorPath("1인사업자")}
-                className="btn-primary px-7 text-base font-bold"
-              >
-                내 사업 세금 정리하기
-                <ArrowRight size={19} />
-              </Link>
-              <Link
-                href="/calculator#industry-diagnosis"
-                className="btn-secondary px-7 text-base font-bold"
-              >
-                <Calculator size={19} />
-                셀러 세금 진단하기
-              </Link>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-ink-muted">
-              <span className="flex items-center gap-2">
-                <CheckCircle2 size={17} className="text-brand-dark" />
-                회원가입 없이 시작
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 size={17} className="text-brand-dark" />
-                신고 일정 정리
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 size={17} className="text-brand-dark" />
-                필요할 때 전문가 연결
-              </span>
-            </div>
-            <Link
-              href="/my-taxes"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-black text-[#6A442D] underline underline-offset-4"
-            >
-              저장한 내 세금 운영표 이어보기
-              <ArrowRight size={16} />
+    <div className="bg-white">
+      <JsonLd data={faqJsonLd(FAQS, absoluteUrl("/"))} />
+      <section aria-labelledby="home-title" className="border-b border-line bg-surface-muted">
+        <div className="app-shell-frame pb-10 pt-10 sm:pb-12 sm:pt-14">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <p className="text-lg font-black text-brand-dark">FindTax</p>
+            <Link href="/my-taxes" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-muted underline underline-offset-4">
+              저장한 내 세금<ArrowRight size={16} aria-hidden />
             </Link>
           </div>
-
+          <h1 id="home-title" className="mt-5 max-w-3xl text-3xl font-extrabold leading-tight text-ink sm:text-[44px]">
+            내 상황에 맞는<br className="sm:hidden" /> 세금 계산과 신고 준비
+          </h1>
+          <p className="mt-4 text-base leading-7 text-ink-muted sm:text-lg">사업·부업부터 가족 증여, 노후 준비까지.</p>
           <TaxDecisionWidget />
-        </div>
-      </section>
-
-      <section className="border-y border-line bg-white" aria-labelledby="starter-guides-title">
-        <div className="app-shell-frame app-section">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="flex items-center gap-2 text-sm font-bold text-brand-dark"><BookOpen size={18} />신고 전 읽어볼 가이드</p>
-              <h2 id="starter-guides-title" className="mt-3 text-3xl font-extrabold text-ink">내 상황에 맞는 판단부터.</h2>
-            </div>
-            <Link href="/blog" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-ink underline underline-offset-4">전체 가이드<ArrowRight size={18} /></Link>
-          </div>
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            {STARTER_GUIDES.map((guide) => {
-              const article = getBlogArticle(guide.slug);
-              if (!article) throw new Error(`Missing starter guide: ${guide.slug}`);
-              return (
-                <Link key={guide.slug} href={`/blog/${guide.slug}`} className="group flex flex-col rounded-lg border border-line p-6 transition-colors hover:border-line-strong hover:bg-surface-muted">
-                  <p className="text-sm font-semibold text-brand-dark">{guide.audience}</p>
-                  <h3 className="mt-4 text-xl font-bold leading-snug text-ink">{article.h1}</h3>
-                  <p className="mt-3 text-base leading-7 text-ink-muted">{guide.summary}</p>
-                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6 text-sm">
-                    <time dateTime={article.dateModified} className="text-neutral-600">수정 {article.dateModified}</time>
-                    <span className="inline-flex items-center gap-2 font-bold text-ink">가이드 읽기<ArrowRight size={17} /></span>
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
+            <p className="text-sm text-ink-muted">계산과 가이드는 회원가입 없이 이용할 수 있습니다.</p>
+            <Link id="calculators" href="/calculator" className="inline-flex min-h-11 scroll-mt-32 items-center gap-2 text-sm font-bold text-ink underline underline-offset-4">
+              <Calculator size={17} aria-hidden />전체 계산기<ArrowRight size={17} aria-hidden />
+            </Link>
           </div>
         </div>
       </section>
 
-      <CalculatorDirectory
-        title="내 숫자로 확인해 보세요."
-        description="예상 세액과 신고 준비 상태를 확인하고, 판단이 어려운 항목은 상담 전에 정리하세요."
-      />
-
-      <section className="bg-bg">
-        <div className="app-shell-frame app-section">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:items-center">
-            <div>
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-dark">
-                <MapPin size={23} />
-              </span>
-              <h2 className="mt-6 text-3xl font-extrabold leading-tight md:text-4xl">
-                가까운 지역의
-                <br />
-                세무사를 찾아보세요.
-              </h2>
-              <p className="mt-5 max-w-md text-base leading-7 text-ink-muted">
-                지역을 선택해 등록 세무사 목록과 연락처를 확인하고, 필요하면 상담을
-                신청할 수 있습니다.
-              </p>
-              <Link href="/region" className="btn-primary mt-7 w-fit px-6 text-sm font-bold">
-                전체 지역 보기
-                <ArrowRight size={18} />
-              </Link>
-            </div>
-
-            <div className="rounded-lg border border-line bg-white p-5 sm:p-7">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-ink">지역 선택</p>
-                <span className="text-xs font-semibold text-ink-soft">17개 시·도</span>
-              </div>
-              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {SIDO_NAMES.map((sido) => (
-                  <Link
-                    key={sido}
-                    href={regionSidoPath(sido)}
-                    className="flex min-h-11 items-center justify-between rounded-lg border border-line bg-surface-muted px-4 text-sm font-semibold text-ink transition-colors hover:border-line-strong hover:bg-brand-accent"
-                  >
-                    {sido}
-                    <ChevronRight size={16} />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
+      <section aria-labelledby="starter-guides-title" className="app-shell-frame py-12 sm:py-16">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="starter-guides-title" className="flex items-center gap-3 text-2xl font-bold text-ink"><BookOpen size={23} aria-hidden />신고 전, 이 질문부터</h2>
+          <Link href="/blog" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink underline underline-offset-4">전체 가이드<ArrowRight size={17} aria-hidden /></Link>
         </div>
-      </section>
-
-      <div className="app-shell-frame app-section space-y-16">
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: Calculator, title: "먼저 계산", text: "상담 전에 예상 세액과 기준을 확인합니다." },
-            { icon: MapPin, title: "지역 검색", text: "전국 시·군·구별 세무사 정보를 찾습니다." },
-            { icon: PhoneCall, title: "바로 연결", text: "전화 또는 상담 신청으로 이어집니다." },
-            { icon: ShieldCheck, title: "개인정보 보호", text: "상담 연결 목적에 필요한 정보만 사용합니다." },
-          ].map((item) => {
-            const Icon = item.icon;
+        <div className="mt-6 grid gap-x-10 md:grid-cols-2">
+          {STARTER_GUIDES.map((guide) => {
+            const article = getBlogArticle(guide.slug);
+            if (!article) return null;
             return (
-              <div key={item.title} className="border-t border-ink pt-5">
-                <Icon size={21} />
-                <h3 className="mt-5 text-lg font-bold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6">{item.text}</p>
-              </div>
+              <Link key={guide.slug} href={`/blog/${guide.slug}`} className="group border-t border-line py-6">
+                <p className="text-sm font-semibold text-brand-dark">{guide.audience}</p>
+                <h3 className="mt-3 text-xl font-bold leading-snug text-ink group-hover:underline underline-offset-4">{article.h1}</h3>
+                <p className="mt-3 text-sm leading-7 text-ink-muted">{guide.summary}</p>
+                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-ink">읽어보기<ArrowRight size={16} aria-hidden /></span>
+              </Link>
             );
           })}
-        </section>
+        </div>
+      </section>
 
-        <LeadSectionTrigger />
+      <section id="consult-section" className="scroll-mt-32 border-y border-line bg-surface-muted" aria-labelledby="consult-title">
+        <div className="app-shell-frame grid gap-6 py-9 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 id="consult-title" className="text-2xl font-bold text-ink">혼자 판단하기 어려운 부분이 있나요?</h2>
+            <p className="mt-3 text-sm leading-7 text-ink-muted">세무사에게 필요한 부분만 물어보세요. 비용과 진행 범위는 의뢰 전에 확인하세요.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href="/consult" className="btn-primary text-sm">상담 요청하기<ArrowRight size={17} aria-hidden /></Link>
+            <Link href="/region" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink underline underline-offset-4"><MapPin size={17} aria-hidden />지역별 세무사</Link>
+          </div>
+        </div>
+      </section>
 
-        <InternalLinksSection links={mainInternalLinks()} />
-        <FaqSection items={faqs} />
-      </div>
-    </>
+      <section className="app-shell-frame py-12 sm:py-16" aria-labelledby="home-faq-title">
+        <h2 id="home-faq-title" className="text-2xl font-bold text-ink">이용 전 궁금한 점</h2>
+        <div className="mt-6 divide-y divide-line border-y border-line">
+          {FAQS.map((faq) => (
+            <details key={faq.question} className="group py-1">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                {faq.question}<ChevronDown size={19} aria-hidden className="shrink-0 group-open:rotate-180" />
+              </summary>
+              <p className="max-w-3xl pb-5 text-sm leading-7 text-ink-muted">{faq.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

@@ -14,6 +14,8 @@ const GA_ALLOWED_KEYS = new Set([
   "device",
   "calculatorType",
   "calculator_type",
+  "blog_slug",
+  "target",
   "resultBand",
   "recommendation",
   "score",
@@ -57,9 +59,17 @@ function googleAnalyticsPayload(payload: Record<string, unknown>) {
   return sanitized;
 }
 
+function isInternalTraffic(): boolean {
+  try {
+    return typeof window !== "undefined" && window.localStorage.getItem("_ft_internal") === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function trackGoogleEvent(eventType: string, payload: Record<string, unknown>): void {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
-  if (window.localStorage.getItem("_ft_internal") === "1") return;
+  if (isInternalTraffic()) return;
   try {
     window.gtag("event", eventType, googleAnalyticsPayload(payload));
   } catch {
@@ -68,11 +78,12 @@ export function trackGoogleEvent(eventType: string, payload: Record<string, unkn
 }
 
 export function trackSiteEvent(eventType: string, payload: Record<string, unknown>): void {
-  if (typeof window !== "undefined" && window.localStorage.getItem("_ft_internal") === "1") return;
+  if (isInternalTraffic()) return;
   trackGoogleEvent(eventType, payload);
   void fetch("/api/track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    keepalive: true,
     body: JSON.stringify({
       eventType,
       payload,

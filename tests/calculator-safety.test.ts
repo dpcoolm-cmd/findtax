@@ -8,7 +8,8 @@ import {
 import { calculateVatFilingDecision } from "../lib/calculators/vat-filing-decision.ts";
 import { calculateComprehensiveIncomeTax } from "../lib/calculators/comprehensive-income-tax.ts";
 import { calculateVatFromGrossAmount, calculateVatFromSupplyAmount } from "../lib/calculators/vat.ts";
-import { calculateGiftTaxDetailed } from "../lib/calculators/gift-tax.ts";
+import { calculateGiftTaxDetailed, getGiftRelationDeduction } from "../lib/calculators/gift-tax.ts";
+import { giftDeductionLimitWon } from "../lib/tax-cases/gift-case.ts";
 import { calculateAcquisitionTax } from "../lib/calculators/acquisition-tax.ts";
 import { calculateCapitalGainsFull } from "../lib/calculators/capital-gains-estimate.ts";
 import { calculateWeeklyHolidayPay } from "../lib/calculators/weekly-holiday-pay.ts";
@@ -168,6 +169,33 @@ test("배우자 증여공제 6억원을 적용한다", () => {
   assert.equal(result.relationDeductionWon, 600_000_000);
   assert.equal(result.taxableBaseWon, 100_000_000);
   assert.equal(result.finalGiftTaxWon, 10_000_000);
+});
+
+test("미성년자 공제와 세대생략 20억원 경계가 계산기와 운영표에 일치한다", () => {
+  const input = { giftValueWon: 70_000_000, adjustmentWon: 0, relation: "lineal_descendant" as const, isGenerationSkipping: false, isResident: true, recipientIsMinor: true };
+  const child = calculateGiftTaxDetailed(input);
+  assert.equal(child.relationDeductionWon, 20_000_000);
+  assert.equal(child.finalGiftTaxWon, 5_000_000);
+  assert.equal(calculateGiftTaxDetailed({ ...input, recipientIsMinor: false }).finalGiftTaxWon, 2_000_000);
+  for (const relation of ["spouse", "lineal_descendant", "lineal_ascendant", "other_relative", "other"] as const) {
+    for (const minor of [true, false]) for (const resident of [true, false]) {
+      assert.equal(getGiftRelationDeduction(relation, resident, minor), giftDeductionLimitWon(relation, minor, resident));
+    }
+  }
+  const at = calculateGiftTaxDetailed({ ...input, giftValueWon: 2_000_000_000, isGenerationSkipping: true });
+  const above = calculateGiftTaxDetailed({ ...input, giftValueWon: 2_000_000_001, isGenerationSkipping: true });
+  assert.equal(at.generationSkippingSurchargeWon, Math.floor(at.baseGiftTaxWon * 0.3));
+  assert.equal(above.generationSkippingSurchargeWon, Math.floor(above.baseGiftTaxWon * 0.4));
+  assert.equal(calculateGiftTaxDetailed({ ...input, relation: "spouse", isGenerationSkipping: true }).generationSkippingSurchargeWon, 0);
+});
+
+test("국민연금 하한과 천원 미만 절사는 다른 보험의 급여기준을 바꾸지 않는다", () => {
+  const low = monthlySocialInsurance({ monthlySalaryWon: 200_000, role: "employee" });
+  assert.equal(low.contributionBaseWon, 410_000);
+  assert.equal(low.nationalPension, 19_475);
+  assert.equal(low.health, 7_190);
+  assert.equal(monthlySocialInsurance({ monthlySalaryWon: 3_000_999, role: "employee" }).contributionBaseWon, 3_000_000);
+  assert.equal(monthlySocialInsurance({ monthlySalaryWon: 0, role: "employee" }).nationalPension, 0);
 });
 
 test("세대생략 증여는 산출세액의 30%를 가산한다", () => {

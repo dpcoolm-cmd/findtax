@@ -43,11 +43,13 @@ function Check({
 }
 
 export function GiftTaxCaseStart({
+  recipientIsMinor,
   giftValueWon,
   relation,
   isGenerationSkipping,
   isResident,
 }: {
+  recipientIsMinor: boolean;
   giftValueWon: number;
   relation: GiftRecipientRelation;
   isGenerationSkipping: boolean;
@@ -57,7 +59,6 @@ export function GiftTaxCaseStart({
   const [priorTenYearGiftsManwon, setPriorTenYearGiftsManwon] = useState("0");
   const [giftDate, setGiftDate] = useState(today);
   const [assetType, setAssetType] = useState<GiftAssetType>("cash");
-  const [recipientIsMinor, setRecipientIsMinor] = useState(false);
   const [knowsPriorGifts, setKnowsPriorGifts] = useState(true);
   const [hasTransferEvidence, setHasTransferEvidence] = useState(false);
   const [hasRelationshipDocument, setHasRelationshipDocument] = useState(false);
@@ -179,11 +180,7 @@ export function GiftTaxCaseStart({
               </select>
             </label>
             {relation === "lineal_descendant" ? (
-              <Check
-                checked={recipientIsMinor}
-                onChange={setRecipientIsMinor}
-                label="수증자가 미성년자예요"
-              />
+              <p className="self-center text-sm text-ink-muted">위 계산기와 동일하게 {recipientIsMinor ? "미성년자" : "성인"} 기준을 적용합니다.</p>
             ) : (
               <div />
             )}
@@ -236,7 +233,7 @@ export function GiftTaxCaseStart({
           </div>
           <div className="mt-5 flex items-start gap-2 rounded-lg bg-white/10 p-3 text-xs leading-5 text-white/75">
             <CalendarDays className="mt-0.5 shrink-0" size={16} />
-            기본 신고기한 {assessment.filingDeadline || "증여일 확인 필요"}
+            <span>기본 신고기한 {assessment.filingDeadline || "증여일 확인 필요"}<br />휴일·기한 연장은 반영하지 않았습니다. 홈택스에서 최종 기한을 확인하세요.</span>
           </div>
         </aside>
       </div>
@@ -264,4 +261,3 @@ export function GiftTaxCaseStart({
     </section>
   );
 }
-

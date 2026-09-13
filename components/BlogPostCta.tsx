@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { trackSiteEvent } from "@/lib/site-track";
 
 type BlogPostCtaProps = {
   slug: string;
@@ -18,20 +19,14 @@ function trackBlogCta(input: {
   href: string;
   calculatorType: string;
 }) {
-  void fetch("/api/track", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      eventType: "blog_cta_click",
-      payload: {
+  trackSiteEvent("blog_cta_click", {
         blog_slug: input.slug,
         target: input.target,
         href: input.href,
         calculator_type: input.calculatorType,
         path: typeof window !== "undefined" ? window.location.pathname : undefined,
-        referrer: typeof document !== "undefined" ? document.referrer : undefined,
-      },
-    }),
+        destination: input.href,
+        placement: "article_end",
   });
 }
 
@@ -62,7 +57,7 @@ export function BlogPostCta({
           }
           className="inline-flex min-h-12 items-center justify-center rounded-lg bg-brand px-5 text-sm font-bold text-brand-dark transition-colors hover:bg-brand-light"
         >
-          판단기 바로가기
+          계산기로 확인하기
         </Link>
         <Link
           href={secondaryHref}
@@ -71,7 +66,7 @@ export function BlogPostCta({
               slug,
               href: secondaryHref,
               calculatorType,
-              target: "consult",
+              target: secondaryHref.startsWith("/consult") ? "consult" : "calculator",
             })
           }
           className="inline-flex min-h-12 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-bold text-neutral-900 transition hover:border-neutral-900"

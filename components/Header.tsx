@@ -192,7 +192,7 @@ export function Header() {
         <div className="hidden lg:block">
           <PartnerRegistrationButton
             label="전문가 입점"
-            className="btn-accent min-h-11 px-5 text-sm"
+            className="btn-secondary min-h-11 px-5 text-sm"
           />
         </div>
 

@@ -15,6 +15,7 @@ const ALLOWED = new Set([
   "calculator_summary_copy",
   "calculator_link_copy",
   "blog_cta_click",
+  "home_entry_click",
   "industry_diagnosis_result_view",
   "industry_diagnosis_cta_click",
   "situation_cta_click",

@@ -12,6 +12,8 @@ import { BLOG_ARTICLES_PART11 } from "@/lib/blog/all-posts-part11";
 import { BLOG_ARTICLES_PART12 } from "@/lib/blog/all-posts-part12";
 import { mergeBlogExtra } from "@/lib/blog/extra-body";
 import type { BlogArticle } from "@/lib/blog/types";
+import { hasSourceReferences } from "./source-references";
+export { hasSourceReferences } from "./source-references";
 
 function finalizeArticle(a: BlogArticle): BlogArticle {
   return mergeBlogExtra(a);
@@ -52,25 +54,14 @@ const ALL_BLOG_ARTICLES: BlogArticle[] = dedupeBySlug(
   ALL_PARTS.flat(),
 ).map(finalizeArticle);
 
-export function isEditoriallyVerifiedArticle(article: BlogArticle): boolean {
-  return Boolean(
-    article.sources?.length &&
-      article.sources.every((source) => {
-        try {
-          return new URL(source.url).protocol === "https:" && /^\d{4}-\d{2}-\d{2}$/.test(source.checkedAt);
-        } catch {
-          return false;
-        }
-      }),
-  );
-}
 
 /**
  * Public blog surfaces only include articles with directly checkable sources.
  * Older drafts remain addressable for link continuity, but are noindex and are
- * excluded from listings and the sitemap until their source review is complete.
+ * excluded from listings and the sitemap until source references are supplied.
+ * This structural filter does not certify factual accuracy or expert review.
  */
-export const BLOG_ARTICLES: BlogArticle[] = ALL_BLOG_ARTICLES.filter(isEditoriallyVerifiedArticle);
+export const BLOG_ARTICLES: BlogArticle[] = ALL_BLOG_ARTICLES.filter(hasSourceReferences);
 
 const bySlug = new Map(ALL_BLOG_ARTICLES.map((a) => [a.slug, a]));
 

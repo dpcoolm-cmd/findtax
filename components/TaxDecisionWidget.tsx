@@ -1,123 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Building2, Calculator, Check, MapPin } from "lucide-react";
-import { useState } from "react";
-import { calculatorPath, regionSidoPath } from "@/lib/seo/urls";
+import { ArrowUpRight, BriefcaseBusiness, Gift, Globe2, Wallet } from "lucide-react";
+import { calculatorPath } from "@/lib/seo/urls";
+import { trackSiteEvent } from "@/lib/site-track";
 
 const OPTIONS = [
-  {
-    id: "business",
-    label: "1인사업자·부업 소득이 있어요",
-    description: "부가세·종소세·원천세와 다음 신고 일정을 정리합니다.",
-    href: calculatorPath("1인사업자"),
-    cta: "내 사업 세금 정리하기",
-  },
-  {
-    id: "seller",
-    label: "온라인·글로벌 판매를 하고 있어요",
-    description: "스마트스토어·구매대행·역직구의 증빙과 세금 위험도를 진단합니다.",
-    href: "/calculator#industry-diagnosis",
-    cta: "셀러 세금 진단하기",
-  },
-  {
-    id: "gift",
-    label: "가족에게 증여할 계획이에요",
-    description: "10년 공제 한도와 예상 세금, 신고기한을 확인합니다.",
-    href: calculatorPath("증여세"),
-    cta: "증여 계획 확인하기",
-  },
-  {
-    id: "retirement",
-    label: "직장인·퇴직 준비가 궁금해요",
-    description: "국민연금과 모은 자산으로 노후 생활비를 얼마나 채울지 비교합니다.",
-    href: "/calculator/retirement-income",
-    cta: "내 노후월급 계산하기",
-  },
+  { id: "business", title: "사업·부업", detail: "1인사업자 · 프리랜서 · N잡", next: "신고할 세금 확인", href: calculatorPath("1인사업자"), icon: BriefcaseBusiness, color: "bg-brand-accent text-brand-dark" },
+  { id: "seller", title: "온라인·해외 셀러", detail: "쇼핑몰 · 구매대행 · 역직구", next: "판매 유형별 진단", href: "/calculator#industry-diagnosis", icon: Globe2, color: "bg-sky-100 text-sky-900" },
+  { id: "gift", title: "가족 증여", detail: "자녀 · 부모 · 배우자", next: "증여세와 신고 준비", href: calculatorPath("증여세"), icon: Gift, color: "bg-rose-100 text-rose-900" },
+  { id: "retirement", title: "연금·노후", detail: "직장인 · 은퇴 준비", next: "노후 생활비 계산", href: "/calculator/retirement-income", icon: Wallet, color: "bg-amber-100 text-amber-900" },
 ] as const;
 
 export function TaxDecisionWidget() {
-  const [selected, setSelected] = useState<(typeof OPTIONS)[number]["id"]>("business");
-  const current = OPTIONS.find((option) => option.id === selected) ?? OPTIONS[0];
-
   return (
-    <div className="rounded-lg border border-line bg-white p-5 shadow-card sm:p-7">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase text-ink-soft">바로 시작하기</p>
-          <h2 className="mt-1 text-2xl font-black text-ink">내 상황부터 선택하세요.</h2>
-        </div>
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-accent text-brand-dark">
-          <Calculator size={21} />
-        </span>
-      </div>
-
-      <div className="mt-6 space-y-2" role="radiogroup" aria-label="세금 상황 선택">
-        {OPTIONS.map((option) => {
-          const active = option.id === selected;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              tabIndex={active ? 0 : -1}
-              onKeyDown={(event) => {
-                const direction = ["ArrowRight", "ArrowDown"].includes(event.key) ? 1 : ["ArrowLeft", "ArrowUp"].includes(event.key) ? -1 : 0;
-                if (!direction) return;
-                event.preventDefault();
-                const next = (OPTIONS.findIndex(o => o.id === selected) + direction + OPTIONS.length) % OPTIONS.length;
-                setSelected(OPTIONS[next].id);
-                const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
-                buttons?.[next]?.focus();
-              }}
-              onClick={() => setSelected(option.id)}
-              className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
-                active
-                  ? "border-line-strong bg-brand-accent/50"
-                  : "border-line bg-white hover:border-ink-soft hover:bg-surface-muted"
-              }`}
-            >
-              <span
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                  active ? "bg-ink text-brand" : "bg-bg-muted text-transparent"
-                }`}
-              >
-                <Check size={14} strokeWidth={3} />
-              </span>
-              <span className="text-sm font-semibold text-ink">{option.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-5 rounded-lg bg-primary p-5 text-white">
-        <p className="text-sm leading-6 text-white/65">{current.description}</p>
-        <Link
-          href={current.href}
-          className="mt-4 flex min-h-12 items-center justify-between rounded-lg bg-brand px-4 text-sm font-bold text-brand-dark hover:bg-brand-light"
-        >
-          {current.cta}
-          <ArrowRight size={18} />
+    <nav aria-label="내 상황으로 시작하기" className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {OPTIONS.map(({ id, title, detail, next, href, icon: Icon, color }) => (
+        <Link key={id} href={href}
+          onClick={() => trackSiteEvent("home_entry_click", { category: id, destination: href, placement: "home_entry", path: "/" })}
+          className="group flex min-w-0 items-center gap-4 rounded-lg border border-line bg-white p-5 transition-colors hover:border-primary sm:min-h-[184px] sm:flex-col sm:items-start sm:gap-0">
+          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${color}`}><Icon size={23} aria-hidden /></span>
+          <div className="min-w-0 flex-1 sm:mt-4">
+            <h2 className="text-lg font-bold text-ink">{title}</h2>
+            <p className="mt-1 text-xs leading-6 text-ink-muted">{detail}</p>
+            <span className="mt-3 hidden text-sm font-semibold text-brand-dark sm:block">{next}</span>
+          </div>
+          <ArrowUpRight size={19} aria-hidden className="shrink-0 text-ink-muted sm:hidden" />
         </Link>
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <Link
-          href={regionSidoPath("서울특별시")}
-          className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-bg-muted px-3 text-sm font-semibold text-ink"
-        >
-          <MapPin size={17} />
-          지역 세무사
-        </Link>
-        <Link
-          href="/consult"
-          className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line px-3 text-sm font-semibold text-ink"
-        >
-          <Building2 size={17} />
-          상담 신청
-        </Link>
-      </div>
-    </div>
+      ))}
+    </nav>
   );
 }

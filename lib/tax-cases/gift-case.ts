@@ -1,4 +1,5 @@
 import type { GiftRecipientRelation } from "@/lib/calculators/gift-tax";
+import { getGiftRelationDeduction } from "../calculators/gift-tax.ts";
 
 export const GIFT_CASE_RULE_VERSION = "gift-case-2026.1";
 
@@ -42,19 +43,7 @@ export function giftDeductionLimitWon(
   recipientIsMinor: boolean,
   isResident: boolean,
 ): number {
-  if (!isResident) return 0;
-  switch (relation) {
-    case "spouse":
-      return 600_000_000;
-    case "lineal_descendant":
-      return recipientIsMinor ? 20_000_000 : 50_000_000;
-    case "lineal_ascendant":
-      return 50_000_000;
-    case "other_relative":
-      return 10_000_000;
-    default:
-      return 0;
-  }
+  return getGiftRelationDeduction(relation, isResident, recipientIsMinor);
 }
 
 export function giftFilingDeadline(giftDate: string): string {
@@ -139,4 +128,3 @@ export function assessGiftCase(input: GiftCaseInput): GiftCaseAssessment {
     warnings,
   };
 }
-

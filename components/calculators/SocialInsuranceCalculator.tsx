@@ -90,9 +90,11 @@ export function SocialInsuranceCalculator() {
 
       <p className="mt-3 text-xs text-neutral-500">
         2026년 7월 기준 참고 요율: 국민연금 근로자·사업주 각 4.75%, 건강 각 3.595%,
-        장기요양(건강보험료의 13.14%), 고용 각 0.9%. 국민연금 기준소득월액에만 상한{" "}
+        장기요양(건강보험료의 13.14%), 고용 각 0.9%. 국민연금 가입 대상자 기준이며 기준소득월액은 천원 미만 절사 후 하한 410,000원, 상한{" "}
         {SOCIAL_INSURANCE_MONTHLY_CAP_WON.toLocaleString("ko-KR")}원을 적용합니다.
+        가입 제외·납부예외·지원금 및 공단별 실제 고지 절사 방식은 반영하지 않습니다.
       </p>
+      <p className="mt-2 text-xs text-neutral-600"><a href="https://www.nps.or.kr/pnsinfo/ntpsklg/getOHAF0097M0.do" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">국민연금공단 기준소득월액 안내</a> · 이 기준 확인: 2026-09-12</p>
 
       {parsedSalary.ok && emp && biz && rows ? (
         <>

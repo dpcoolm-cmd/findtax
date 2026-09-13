@@ -8,6 +8,7 @@
 
 /** 국민연금 기준소득월액 상한(2026-07-01~2027-06-30) */
 export const NATIONAL_PENSION_MONTHLY_CAP_WON = 6_590_000;
+export const NATIONAL_PENSION_MONTHLY_MIN_WON = 410_000;
 
 /** 기존 UI 호환용 별칭. 국민연금에만 적용된다. */
 export const SOCIAL_INSURANCE_MONTHLY_CAP_WON = NATIONAL_PENSION_MONTHLY_CAP_WON;
@@ -56,7 +57,7 @@ export function monthlySocialInsurance(input: {
       salaryCapped: false,
     };
   }
-  const pensionBase = Math.min(Math.max(0, raw), NATIONAL_PENSION_MONTHLY_CAP_WON);
+  const pensionBase = Math.min(Math.max(NATIONAL_PENSION_MONTHLY_MIN_WON, Math.floor(raw / 1_000) * 1_000), NATIONAL_PENSION_MONTHLY_CAP_WON);
   const healthEmploymentBase = Math.max(0, raw);
   const salaryCapped = raw > NATIONAL_PENSION_MONTHLY_CAP_WON;
   const np = floorByRate(pensionBase, RATES_2026.nationalPensionEmployee);

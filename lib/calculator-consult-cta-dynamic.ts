@@ -74,7 +74,7 @@ export function getDynamicCalculatorConsultCopy(
     return {
       title: "금액 규모가 커지면 신고·쟁점 리스크도 커질 수 있습니다. 세무사 상담으로 방향을 잡아 보세요.",
       subtitle:
-        "⚠️ 증여세가 큽니다. 부담부증여 등 절세 전략을 세무사에게 확인하세요.",
+        "과거 증여·사용한 공제·재산 평가를 함께 확인하세요. 상담 비용과 검토 범위는 의뢰 전에 확인할 수 있습니다.",
       buttonLabel: BTN.strong,
     };
   }

@@ -4,82 +4,13 @@ import { notFound } from "next/navigation";
 import { BlogPostCta } from "@/components/BlogPostCta";
 import { JsonLd } from "@/components/JsonLd";
 import { resolveBlogCategory } from "@/lib/blog/categories";
-import { getAllBlogSlugs, getBlogArticle, isEditoriallyVerifiedArticle } from "@/lib/blog/posts";
+import { getAllBlogSlugs, getBlogArticle, hasSourceReferences } from "@/lib/blog/posts";
+import { getBlogCta } from "@/lib/blog/cta";
 import { getBaseUrl, siteName } from "@/lib/seo/site";
 import { absoluteUrl } from "@/lib/seo/urls";
 
 type Props = { params: Promise<{ slug: string }> };
 
-function getBlogCta(article: { slug: string; h1: string; keywords: string[] }) {
-  const text = `${article.slug} ${article.h1} ${article.keywords.join(" ")}`;
-
-  if (["연금저축계좌-세액공제-입문", "연금저축-irp-etf-구성-초보"].includes(article.slug)) {
-    return { title: "모은 연금, 월급으로 몇 년 쓸 수 있을까요?", description: "국민연금 수령 전 공백과 물가를 반영해 노후 부족생활비를 계산합니다.", href: "/calculator/retirement-income", calculatorType: "retirement_income" };
-  }
-
-  if (text.includes("기장")) {
-    return {
-      title: "기장료가 적정한지 먼저 비교해 보세요",
-      description:
-        "매출, 거래자료 수, 직원 수를 넣으면 직접 관리가 나은지 기장 의뢰가 나은지 판단할 수 있습니다.",
-      href: "/calculator/jangbu",
-      calculatorType: "bookkeeping_decision",
-    };
-  }
-
-  if (
-    text.includes("부가세") ||
-    text.includes("구매대행") ||
-    text.includes("역직구") ||
-    text.includes("스마트스토어")
-  ) {
-    return {
-      title: "부가세 신고를 직접 할지 세무사에게 맡길지 확인하세요",
-      description:
-        "과세유형, 매출·매입자료, 플랫폼 정산, 해외판매 여부를 기준으로 신고 난이도를 진단합니다.",
-      href: "/calculator/부가세",
-      calculatorType: "vat_decision",
-    };
-  }
-
-  if (text.includes("부업")) {
-    return {
-      title: "부업 세금 위험도를 먼저 확인하세요",
-      description:
-        "월평균 수입, 비용, 원천징수, 사업자등록 상태를 넣으면 종합소득세·부가세 검토 필요성을 볼 수 있습니다.",
-      href: "/calculator/부업",
-      calculatorType: "side_hustle",
-    };
-  }
-
-  if (text.includes("양도")) {
-    return {
-      title: "양도세 부담과 상담 필요성을 먼저 계산해 보세요",
-      description:
-        "양도가액, 취득가액, 필요경비를 바탕으로 예상 세액과 상담 필요 구간을 확인합니다.",
-      href: "/calculator/양도세",
-      calculatorType: "transfer_tax",
-    };
-  }
-
-  if (text.includes("연금") || text.includes("IRP") || text.includes("ISA")) {
-    return {
-      title: "연금·IRP 절세 효과를 숫자로 확인하세요",
-      description:
-        "소득 구간과 납입액을 넣으면 예상 세액공제와 계좌별 납입 구성을 비교할 수 있습니다.",
-      href: "/calculator/연말정산",
-      calculatorType: "year_end_tax",
-    };
-  }
-
-  return {
-    title: "종합소득세를 직접 신고할지 판단해 보세요",
-    description:
-      "소득 유형, 수입·비용, 원천징수, 증빙 상태를 넣으면 직접 신고 가능성과 세무사 검토 필요성을 나눠 보여줍니다.",
-    href: "/calculator/종합소득세",
-    calculatorType: "income_decision",
-  };
-}
 
 export async function generateStaticParams() {
   return getAllBlogSlugs().map((slug) => ({ slug }));
@@ -108,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: article.metaDescription,
     keywords: article.keywords,
     alternates: { canonical: url },
-    robots: isEditoriallyVerifiedArticle(article)
+    robots: hasSourceReferences(article)
       ? { index: true, follow: true }
       : { index: false, follow: true },
     openGraph: {
@@ -198,7 +129,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="mt-4 border-l-2 border-brand-dark pl-4 text-sm leading-6 text-neutral-600">
           <p>작성·편집: FindTax 편집팀</p>
           <p>
-            검토 범위: 아래 표시된 원자료의 요건·기한·수치를 대조했습니다. 세무사의 개별 검수나 자문을 뜻하지 않습니다.
+            출처 표시는 참고한 자료를 안내하며, 모든 내용의 최신성이나 세무사의 개별 검수를 보증하지 않습니다.
           </p>
         </div>
         {article.revisionNote ? (
@@ -207,6 +138,12 @@ export default async function BlogPostPage({ params }: Props) {
         <p className="mt-8 text-lg leading-relaxed text-neutral-800">
           {article.intro}
         </p>
+        {!hasSourceReferences(article) ? (
+          <aside className="mt-5 border-l-4 border-amber-600 bg-amber-50 p-4 text-sm leading-7 text-ink">
+            보관된 이전 글입니다. 출처 보완이 필요하므로 이 글만으로 신고나 거래를 결정하지 마세요.
+            <Link href="/blog" className="ml-2 font-semibold underline underline-offset-4">현재 가이드 보기</Link>
+          </aside>
+        ) : null}
 
         <nav aria-label="이 글의 목차" className="mt-8 border-y border-line py-5">
           <h2 className="text-base font-bold text-ink">이 글에서 확인할 내용</h2>
@@ -260,7 +197,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {article.sources?.length ? (
           <section className="mt-10 border-t border-line pt-6">
-            <h2 className="text-base font-bold text-ink">확인한 공식 자료</h2>
+            <h2 className="text-base font-bold text-ink">출처와 참고 자료</h2>
             <ul className="mt-3 space-y-2 text-sm text-ink-muted">
               {article.sources.map((source) => (
                 <li key={source.url}>

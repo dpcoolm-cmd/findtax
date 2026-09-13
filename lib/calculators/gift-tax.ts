@@ -23,6 +23,7 @@ export type GiftTaxDetailedInput = {
   relation: GiftRecipientRelation;
   isGenerationSkipping: boolean;
   isResident: boolean;
+  recipientIsMinor?: boolean;
 };
 
 export type GiftTaxDetailedResult = {
@@ -96,6 +97,7 @@ export function getGiftRelationLabel(relation: GiftRecipientRelation): string {
 export function getGiftRelationDeduction(
   relation: GiftRecipientRelation,
   isResident: boolean,
+  recipientIsMinor = false,
 ): number {
   if (!isResident) return 0;
 
@@ -103,7 +105,7 @@ export function getGiftRelationDeduction(
     case "spouse":
       return 600_000_000;
     case "lineal_descendant":
-      return 50_000_000;
+      return recipientIsMinor ? 20_000_000 : 50_000_000;
     case "lineal_ascendant":
       return 50_000_000;
     case "other_relative":
@@ -117,13 +119,14 @@ export function getGiftRelationDeduction(
 export function calculateGiftTaxDetailed(input: GiftTaxDetailedInput): GiftTaxDetailedResult {
   const giftValueWon = Math.max(0, Math.floor(input.giftValueWon));
   const adjustmentWon = Math.max(0, Math.floor(input.adjustmentWon));
-  const relationDeductionWon = getGiftRelationDeduction(input.relation, input.isResident);
+  const relationDeductionWon = getGiftRelationDeduction(input.relation, input.isResident, input.recipientIsMinor);
   const totalDeductionWon = adjustmentWon + relationDeductionWon;
   const taxableBaseWon = calculateGiftTaxableBase(giftValueWon, totalDeductionWon);
   const baseGiftTaxWon = calculateGiftTax(taxableBaseWon);
   const bracketInfo = getGiftTaxBracketInfo(taxableBaseWon);
-  const generationSkippingSurchargeWon = input.isGenerationSkipping
-    ? Math.floor(baseGiftTaxWon * 0.3)
+  const surchargeRate = input.recipientIsMinor && giftValueWon > 2_000_000_000 ? 0.4 : 0.3;
+  const generationSkippingSurchargeWon = input.isGenerationSkipping && input.relation === "lineal_descendant"
+    ? Math.floor(baseGiftTaxWon * surchargeRate)
     : 0;
   const finalGiftTaxWon = baseGiftTaxWon + generationSkippingSurchargeWon;
 

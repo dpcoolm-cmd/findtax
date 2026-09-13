@@ -196,6 +196,7 @@ export function GiftTaxCalculator() {
   const [relation, setRelation] = useState<GiftRecipientRelation>("lineal_descendant");
   const [isGenerationSkipping, setIsGenerationSkipping] = useState(false);
   const [isResident, setIsResident] = useState(true);
+  const [recipientIsMinor, setRecipientIsMinor] = useState(false);
 
   const result = useMemo(() => {
     const parsedGiftValue = parsePositiveManwonString(giftValue);
@@ -214,6 +215,7 @@ export function GiftTaxCalculator() {
       relation,
       isGenerationSkipping,
       isResident,
+      recipientIsMinor,
     });
 
     const warnings: string[] = [];
@@ -226,7 +228,7 @@ export function GiftTaxCalculator() {
     if (!isResident) {
       warnings.push("거주자 여부에 따라 공제 적용이 달라질 수 있어요.");
     }
-    warnings.push("관계 선택에 따라 공제 금액이 달라져요.");
+    warnings.push("과거 10년 증여로 이미 사용한 공제는 이 세액에 반영하지 않았습니다. 해당 내역이 있으면 아래 신고 준비에서 확인하세요.");
 
     const assumptions = [
       "입력한 증여재산가액 기준으로 계산했어요.",
@@ -253,7 +255,7 @@ export function GiftTaxCalculator() {
         limitations,
       },
     };
-  }, [adjustment, giftValue, isGenerationSkipping, isResident, relation]);
+  }, [adjustment, giftValue, isGenerationSkipping, isResident, relation, recipientIsMinor]);
 
   const summary = useMemo(() => {
     if (!result.data) return null;
@@ -263,15 +265,8 @@ export function GiftTaxCalculator() {
   const headline = useMemo(() => {
     if (!result.data) return null;
     const tax = result.data.finalGiftTaxWon;
-    const taxable = result.data.taxableBaseWon;
-
-    if (tax >= 20_000_000) {
-      return "이번 증여는 세금 부담이 큰 편이라 미리 구조를 살펴보는 게 좋아요.";
-    }
-    if (tax === 0 || taxable <= 50_000_000) {
-      return "현재 입력 기준으로는 세금 부담이 크지 않은 편이에요.";
-    }
-    return "증여 대상과 공제 구조에 따라 세액 차이가 날 수 있는 케이스예요.";
+    if (tax === 0) return "입력 조건에서 산출세액은 0원입니다. 과거 증여와 신고 대상 여부는 별도로 확인하세요.";
+    return "입력 조건에 따른 산출세액입니다. 공제 이력과 신고세액공제에 따라 실제 납부액은 달라집니다.";
   }, [result.data]);
 
   const oneLineSummary = useMemo(() => {
@@ -302,9 +297,9 @@ export function GiftTaxCalculator() {
       !isResident ||
       result.data.adjustmentWon >= Math.floor(result.data.giftValueWon * 0.2)
     ) {
-      return "보수적으로 볼 필요 있음";
+      return "별도 조건 검토 필요";
     }
-    return "보통";
+    return "과거 증여 이력 확인";
   }, [isGenerationSkipping, isResident, result.data]);
 
   const formulaBody = useMemo(() => {
@@ -328,6 +323,7 @@ export function GiftTaxCalculator() {
     });
 
     const childHalfScenario = calculateGiftTaxDetailed({
+      recipientIsMinor,
       giftValueWon: Math.floor(result.data.giftValueWon / 2),
       adjustmentWon: Math.floor(result.data.adjustmentWon / 2),
       relation: "lineal_descendant",
@@ -352,7 +348,7 @@ export function GiftTaxCalculator() {
       bestScenario,
       showLargeDifferenceWarning: maxDiffWon >= 5_000_000,
     };
-  }, [isResident, result.data]);
+  }, [isResident, result.data, recipientIsMinor]);
 
   const ctaBand = useMemo(
     () => (result.data ? bandGiftTax(result.data.finalGiftTaxWon, result.data.taxableBaseWon) : "low"),
@@ -380,10 +376,10 @@ export function GiftTaxCalculator() {
           onChange={setAdjustment}
           placeholder="예: 1000"
           tooltip="증여재산가액에서 빼서 계산할 금액이에요."
-          helpText="예: 1,000만원이면 1000으로 입력해요. 채무 인수나 별도 차감 사유가 있으면 합산해 입력해 주세요."
+          helpText="아래 관계별 기본공제는 자동 반영되므로 중복 입력하지 마세요. 채무 인수 등 별도 차감은 적용 요건을 확인해야 합니다."
         />
         <SelectField
-          label="증여자와의 관계"
+          label="받는 사람은 주는 사람의 누구인가요?"
           value={relation}
           onChange={(v) => setRelation(v as GiftRecipientRelation)}
           tooltip="관계에 따라 공제 기준이 달라져요."
@@ -396,11 +392,14 @@ export function GiftTaxCalculator() {
           ]}
         />
         <div className="grid gap-2">
+          {relation === "lineal_descendant" ? (
+            <CheckRow checked={recipientIsMinor} onChange={setRecipientIsMinor} label="받는 사람이 미성년자예요" sub="직계존속에게 받는 미성년자 기본공제는 10년 2,000만원입니다." />
+          ) : null}
           <CheckRow
             checked={isGenerationSkipping}
             onChange={setIsGenerationSkipping}
             label="세대생략 여부"
-            tooltip="부모를 건너뛰고 자녀나 손자녀에게 증여하는 경우처럼 할증 이슈가 생길 수 있어요."
+            tooltip="조부모가 손자녀에게 주는 경우 등입니다. 부모 사망에 따른 예외, 과거 증여 합산은 별도 검토가 필요합니다."
             sub="세대생략이면 세액이 더 커질 수 있어요."
           />
           <CheckRow
@@ -433,14 +432,14 @@ export function GiftTaxCalculator() {
             <p className="mt-4 text-sm leading-relaxed text-neutral-600">{whyThis}</p>
 
             <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-sm font-semibold text-slate-900">숫자 신뢰도 안내</p>
+              <p className="text-sm font-semibold text-slate-900">계산 범위 안내</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-3">
                 <div>
                   <p className="text-xs text-slate-500">간이 계산 기준</p>
                   <p className="mt-1 text-sm font-semibold text-slate-900">일반적인 상황 기준</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">정확도</p>
+                  <p className="text-xs text-slate-500">추가 확인</p>
                   <p className="mt-1 text-sm font-semibold text-slate-900">{confidenceLabel}</p>
                 </div>
                 <div>
@@ -540,14 +539,14 @@ export function GiftTaxCalculator() {
               value={won(result.data.generationSkippingSurchargeWon)}
               sub={result.data.generationSkippingSurchargeWon > 0 ? "30% 할증 반영" : "해당 없음"}
             />
-            <ResultRow label="최종 증여세" value={won(result.data.finalGiftTaxWon)} bold highlight />
+            <ResultRow label="세액공제 전 추정액" value={won(result.data.finalGiftTaxWon)} bold highlight />
           </dl>
 
           {simulations ? (
             <div className="mt-5 rounded-2xl border border-[#d6e4ff] bg-[#f7faff] p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-[#163d7a]">유득 시뮬레이션</p>
+                  <p className="text-sm font-semibold text-[#163d7a]">증여 대상별 비교</p>
                   <p className="mt-1 text-xs leading-relaxed text-[#365b96]">
                     누구에게 어떻게 나누는지에 따라 세금 차이가 얼마나 날 수 있는지 비교했어요.
                   </p>
@@ -613,8 +612,9 @@ export function GiftTaxCalculator() {
 
           <CalculatorEstimateNotice badge="참고용 간이 추정">
             <p>
-              증여는 누구에게 어떻게 나누느냐에 따라 결과가 달라질 수 있어요. 정확한 금액은 세무사와 한 번 더 확인해 보세요.
+              신고세액공제·기납부세액공제·가산세는 반영하지 않습니다. 받는 사람을 바꾸는 비교는 재산의 실제 소유자가 달라지는 별개의 거래이며, 같은 사람에게 우회 증여하는 절세 방법이 아닙니다.
             </p>
+            <a className="underline underline-offset-4" href="https://i.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7728&mi=2340" target="_blank" rel="noopener noreferrer">국세청 증여세 계산 기준 확인</a>
           </CalculatorEstimateNotice>
         </>
       ) : (
@@ -625,6 +625,7 @@ export function GiftTaxCalculator() {
 
       {result.data ? (
         <GiftTaxCaseStart
+          recipientIsMinor={recipientIsMinor}
           giftValueWon={result.data.giftValueWon}
           relation={relation}
           isGenerationSkipping={isGenerationSkipping}
