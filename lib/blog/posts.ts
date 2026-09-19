@@ -12,6 +12,7 @@ import { BLOG_ARTICLES_PART11 } from "@/lib/blog/all-posts-part11";
 import { BLOG_ARTICLES_PART12 } from "@/lib/blog/all-posts-part12";
 import { BLOG_ARTICLES_PART13 } from "@/lib/blog/all-posts-part13";
 import { BLOG_ARTICLES_PART14 } from "@/lib/blog/all-posts-part14";
+import { BLOG_ARTICLES_PART15 } from "@/lib/blog/all-posts-part15";
 import { mergeBlogExtra } from "@/lib/blog/extra-body";
 import type { BlogArticle } from "@/lib/blog/types";
 import { hasSourceReferences } from "./source-references";
@@ -27,6 +28,7 @@ function finalizeArticle(a: BlogArticle): BlogArticle {
  * 새 파트를 추가할 때는 import 후 이 배열 맨 앞에 넣기만 하면 됩니다.
  */
 const ALL_PARTS: BlogArticle[][] = [
+  BLOG_ARTICLES_PART15,
   BLOG_ARTICLES_PART14,
   BLOG_ARTICLES_PART13,
   BLOG_ARTICLES_PART12,
