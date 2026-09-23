@@ -3,7 +3,8 @@ import { COMPREHENSIVE_INCOME_TAX_REFERENCE_YEAR } from "../../config/tax-displa
 /**
  * 종합소득세 — 산출세액(과세표준 기준) 간이 계산
  *
- * - **2026년 기준** 소득세법 시행령 [별표 4] 과세표준별 산출세율·누진공제(원 미만 절사).
+ * - **2026년 기준** 소득세법 제55조 제1항 과세표준별 산출세율·누진공제(원 미만 절사).
+ * - 국세청 세율표: https://d.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7667&mi=2227
  * - **정식 신고용 아님**: 세액공제·분리과세·종합한도초과과세·조세특례·기타경비 한도 등 미반영.
  *
  * 세액 = max(0, floor(과세표준 × 세율 − 누진공제))

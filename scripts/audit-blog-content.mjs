@@ -4,6 +4,8 @@ import { pathToFileURL } from "node:url";
 import ts from "typescript";
 import { hasSourceReferences } from "../lib/blog/source-references.ts";
 import { getBlogCta } from "../lib/blog/cta.ts";
+import { mergeBlogExtra } from "../lib/blog/extra-body.ts";
+import { getContentReviewFlags } from "../lib/blog/content-audit.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
 const catalogPath = path.join(root, "lib/blog/posts.ts");
@@ -35,7 +37,7 @@ for (const partName of partNames) {
   for (const article of module[binding.name]) {
     if (seen.has(article.slug)) continue;
     seen.add(article.slug);
-    articles.push({ ...article, sourceFile: path.relative(root, file) });
+    articles.push({ ...mergeBlogExtra(article), sourceFile: path.relative(root, file) });
   }
 }
 const rows = articles.map((article) => ({
@@ -45,13 +47,21 @@ const rows = articles.map((article) => ({
   sourceCount: article.sources?.length ?? 0,
   modified: article.dateModified,
   primaryDestination: getBlogCta(article).href,
-  reviewFlags: [
-    ...(!hasSourceReferences(article) ? ["SOURCE_REFERENCES_NEEDED"] : []),
-    ...(/세제개편|2027|2028/.test(`${article.slug} ${article.h1}`) ? ["CHECK_PROPOSAL_VS_ENACTED"] : []),
-  ],
+  reviewFlags: getContentReviewFlags(article),
 }));
+if (process.argv.includes("--markdown")) {
+  console.log("# FindTax 콘텐츠 검수 대상 목록\n");
+  console.log("자동 구조 점검 목록입니다. 오류 확정·사실 검증 완료·AdSense 승인 판정이 아닙니다. 보충 본문을 포함해 점검하며 개별 검수 기록은 작업 보고서에 남깁니다.\n");
+  console.log(`전체 ${rows.length}개 / 출처 연결 공개 글 ${rows.filter((row) => row.sourceLinked).length}개 / 보관 글 ${rows.filter((row) => !row.sourceLinked).length}개\n`);
+  console.log("| 기존 URL의 slug | 공개 상태 | 다음 확인 항목 |\n| --- | --- | --- |");
+  for (const row of rows) {
+    console.log(`| ${row.slug} | ${row.sourceLinked ? "공개" : "보관"} | ${row.reviewFlags.join(", ") || "자동 경고 없음: 개별 사실 검증 필요"} |`);
+  }
+  console.log("\n우선순위: 공개 글의 제목·설명과 본문 불일치 → 구체적 근거가 없는 세무 주장 → 보관 글의 출처·중복 → 실용적 사례 및 다음 행동. 보관/noindex는 AdSense 심사 제외를 의미하지 않습니다.");
+  process.exit(0);
+}
 console.log(JSON.stringify({
-  note: "Structural inventory only. Not a factual review or AdSense approval verdict. Inspect extra-body.ts and rendered pages too.",
+  note: "Structural inventory including extra-body.ts. Not a factual review or AdSense approval verdict. Verify primary evidence and rendered pages too.",
   total: rows.length,
   sourceLinked: rows.filter((row) => row.sourceLinked).length,
   archived: rows.filter((row) => !row.sourceLinked).length,

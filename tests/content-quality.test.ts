@@ -6,6 +6,63 @@ import { BLOG_ARTICLES_PART1 } from "../lib/blog/all-posts-part1.ts";
 import { mergeBlogExtra } from "../lib/blog/extra-body.ts";
 import { hasSourceReferences } from "../lib/blog/source-references.ts";
 import { getBlogCta } from "../lib/blog/cta.ts";
+import { BLOG_ARTICLES_PART10 } from "../lib/blog/all-posts-part10.ts";
+import { getContentReviewFlags } from "../lib/blog/content-audit.ts";
+
+test("revised policy articles distinguish proposals throughout the reading path", () => {
+  for (const original of BLOG_ARTICLES_PART10) {
+    const article = mergeBlogExtra(original);
+    assert.equal(article.datePublished, "2026-09-02");
+    assert.equal(article.dateModified, "2026-09-22");
+    assert.ok(article.revisionNote);
+    assert.deepEqual(article.sections, original.sections);
+    assert.ok(article.sections.some((section) => section.table));
+    assert.ok(article.sections.some((section) => section.checklist?.length));
+    assert.deepEqual(getContentReviewFlags(article), ["CHECK_PROPOSAL_VS_ENACTED"]);
+    for (const section of article.sections) {
+      for (const row of section.table?.rows ?? []) {
+        assert.equal(row.length, section.table?.headers.length);
+      }
+    }
+  }
+});
+
+test("policy corrections retain exclusions, calculation limits and suitable handoffs", () => {
+  const [business, family, platform] = BLOG_ARTICLES_PART10;
+  assert.match(JSON.stringify(business), /15년/);
+  assert.match(getBlogCta(business).description, /가업상속공제.*계산하지 않습니다/);
+  assert.match(JSON.stringify(family), /2024~2026/);
+  assert.match(JSON.stringify(family), /근로소득자만을 대상으로 하는 것은 아닙니다/);
+  assert.equal(getBlogCta(family).href, "/calculator");
+  assert.match(JSON.stringify(platform), /1\.1%포인트/);
+  assert.match(JSON.stringify(platform), /연말정산 대상 인적용역/);
+  assert.match(JSON.stringify(platform), /환급액이 아닙니다/);
+  assert.equal(getBlogCta(platform).href, "/calculator/종합소득세");
+  const moneyTable = platform.sections.find((section) => section.table?.caption.startsWith("100만원"))?.table;
+  assert.deepEqual(moneyTable?.rows, [
+    ["지급액", "1,000,000원", "1,000,000원"],
+    ["미리 낸 세금", "33,000원", "22,000원"],
+    ["세금 차감 후 수령액", "967,000원", "978,000원"],
+  ]);
+});
+
+test("audit flags proposal metadata mismatches and generic sources without certifying accuracy", () => {
+  const article = { ...BLOG_ARTICLES_PART10[0], h1: "세금이 달라집니다", metaTitle: "혜택이 늘어납니다", metaDescription: "더 많은 공제가 적용됩니다", sources: [{ title: "국세청", url: "https://www.nts.go.kr/", checkedAt: "2026-09-15" }] };
+  const flags = getContentReviewFlags(article);
+  assert.ok(flags.includes("CHECK_PROPOSAL_HEADLINE"));
+  assert.ok(flags.includes("CHECK_PROPOSAL_DESCRIPTION"));
+  assert.ok(flags.includes("SPECIFIC_SOURCE_NEEDED"));
+  assert.ok(!flags.includes("SOURCE_REFERENCES_NEEDED"));
+  assert.ok(getContentReviewFlags({ ...article, sources: [] }).includes("SOURCE_REFERENCES_NEEDED"));
+});
+
+test("audit includes appended content rather than only the catalog body", () => {
+  const starter = BLOG_ARTICLES_PART1.find((article) => article.slug === "2026-종합소득세-신고-방법");
+  assert.ok(starter);
+  assert.ok(mergeBlogExtra(starter).sections.length > starter.sections.length);
+  const script = readFileSync(new URL("../scripts/audit-blog-content.mjs", import.meta.url), "utf8");
+  assert.match(script, /mergeBlogExtra\(article\)/);
+});
 
 const reviewedSlugs = [
   "부가세-신고-세무사-직접-판단",

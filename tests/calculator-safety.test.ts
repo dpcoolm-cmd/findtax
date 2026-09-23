@@ -7,6 +7,7 @@ import {
 } from "../lib/calculators/social-insurance-2026.ts";
 import { calculateVatFilingDecision } from "../lib/calculators/vat-filing-decision.ts";
 import { calculateComprehensiveIncomeTax } from "../lib/calculators/comprehensive-income-tax.ts";
+import { getAppliedComprehensiveIncomeBracket } from "../lib/calculators/comprehensive-income-tax.ts";
 import { calculateVatFromGrossAmount, calculateVatFromSupplyAmount } from "../lib/calculators/vat.ts";
 import { calculateGiftTaxDetailed, getGiftRelationDeduction } from "../lib/calculators/gift-tax.ts";
 import { giftDeductionLimitWon } from "../lib/tax-cases/gift-case.ts";
@@ -38,6 +39,28 @@ import {
   sellerCaseTasks,
 } from "../lib/tax-cases/guided-case-definitions.ts";
 import { isAdEligiblePath } from "../lib/seo/ad-eligibility.ts";
+
+test("종합소득세는 원천징수율이 아닌 국세청 기본세율의 모든 경계값을 적용한다", () => {
+  const boundaries = [
+    [14_000_000, 840_000, 0.06, 0.15],
+    [50_000_000, 6_240_000, 0.15, 0.24],
+    [88_000_000, 15_360_000, 0.24, 0.35],
+    [150_000_000, 37_060_000, 0.35, 0.38],
+    [300_000_000, 94_060_000, 0.38, 0.4],
+    [500_000_000, 174_060_000, 0.4, 0.42],
+    [1_000_000_000, 384_060_000, 0.42, 0.45],
+  ];
+  for (const [income, tax, rate, nextRate] of boundaries) {
+    assert.equal(calculateComprehensiveIncomeTax(income), tax);
+    assert.equal(getAppliedComprehensiveIncomeBracket(income).rate, rate);
+    assert.equal(getAppliedComprehensiveIncomeBracket(income + 1).rate, nextRate);
+    assert.equal(calculateComprehensiveIncomeTax(income - 1), tax - 1);
+    assert.equal(calculateComprehensiveIncomeTax(income + 1), tax);
+  }
+  assert.equal(calculateComprehensiveIncomeTax(0), 0);
+  assert.equal(calculateComprehensiveIncomeTax(-1), 0);
+  assert.equal(calculateComprehensiveIncomeTax(2_000_000_000), 834_060_000);
+});
 
 test("광고는 콘텐츠 페이지에만 표시하고 전환·회원·정책 경로에서는 숨긴다", () => {
   assert.equal(isAdEligiblePath("/"), true);
