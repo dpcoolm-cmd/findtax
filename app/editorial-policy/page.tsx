@@ -23,7 +23,7 @@ export default function EditorialPolicyPage() {
         <section>
           <h2 className="text-2xl font-bold text-ink">3. 광고가 결론을 바꾸지 않습니다</h2>
           <p className="mt-3">광고·제휴·전문가 연결은 콘텐츠의 선정 기준과 분리합니다. 대가성 링크나 상담 연결이 있을 때는 이용자가 알아볼 수 있도록 표시합니다.</p>
-          <p className="mt-3">현재 전역 고정 광고와 자동 광고 스크립트는 사용하지 않습니다. 광고를 도입하더라도 본문과 구분하고, 계산·신고 자료 확인을 가리지 않는 배치만 검토합니다.</p>
+          <p className="mt-3">서비스는 Google AdSense 자동 광고를 운영합니다. 광고는 편집·자료 선정과 분리하며, 광고가 세금 정보나 상담 안내로 오인되지 않도록 합니다. 광고 배치는 이용자가 본문과 계산·신고 자료를 확인하는 데 지장을 주지 않도록 점검합니다.</p>
         </section>
         <section>
           <h2 className="text-2xl font-bold text-ink">4. 수정 이력을 남깁니다</h2>

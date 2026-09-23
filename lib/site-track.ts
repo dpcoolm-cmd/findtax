@@ -41,7 +41,9 @@ const GA_ALLOWED_KEYS = new Set([
   "action",
 ]);
 
-function googleAnalyticsPayload(payload: Record<string, unknown>) {
+let previousPageLocation: string | null = null;
+
+function googleAnalyticsPayload(eventType: string, payload: Record<string, unknown>) {
   const sanitized: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(payload)) {
     if (!GA_ALLOWED_KEYS.has(key)) continue;
@@ -53,6 +55,39 @@ function googleAnalyticsPayload(payload: Record<string, unknown>) {
   if (typeof sanitized.path === "string") sanitized.page_path = sanitized.path;
   if (typeof sanitized.title === "string") sanitized.page_title = sanitized.title;
   if (typeof sanitized.referrer === "string") sanitized.page_referrer = sanitized.referrer;
+  if (eventType === "page_view" && typeof sanitized.path === "string" && typeof window !== "undefined") {
+    const pageUrl = new URL(window.location.href);
+    pageUrl.pathname = sanitized.path;
+    pageUrl.search = "";
+    const currentParams = new URLSearchParams(window.location.search);
+    for (const key of [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+      "gclid",
+      "dclid",
+      "gbraid",
+      "wbraid",
+    ]) {
+      const value = currentParams.get(key);
+      if (value) pageUrl.searchParams.set(key, value);
+    }
+    pageUrl.hash = "";
+    sanitized.page_location = pageUrl.toString();
+    if (previousPageLocation) {
+      sanitized.page_referrer = previousPageLocation;
+    } else if (typeof sanitized.page_referrer === "string" && sanitized.page_referrer) {
+      try {
+        const referrerUrl = new URL(sanitized.page_referrer);
+        sanitized.page_referrer = `${referrerUrl.origin}${referrerUrl.pathname}`;
+      } catch {
+        delete sanitized.page_referrer;
+      }
+    }
+    previousPageLocation = `${pageUrl.origin}${pageUrl.pathname}`;
+  }
   delete sanitized.path;
   delete sanitized.title;
   delete sanitized.referrer;
@@ -71,7 +106,7 @@ export function trackGoogleEvent(eventType: string, payload: Record<string, unkn
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
   if (isInternalTraffic()) return;
   try {
-    window.gtag("event", eventType, googleAnalyticsPayload(payload));
+    window.gtag("event", eventType, googleAnalyticsPayload(eventType, payload));
   } catch {
     // Analytics failure must never affect the user flow.
   }
