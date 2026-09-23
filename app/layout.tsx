@@ -82,6 +82,15 @@ export default function RootLayout({
           content="482df90ab22d80ffab80cbcac33a281c06d36fba"
         />
       </head>
+      {adsenseClient ? (
+        <Script
+          id="google-adsense"
+          async
+          crossOrigin="anonymous"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+          strategy="beforeInteractive"
+        />
+      ) : null}
       <body className="min-h-dvh touch-manipulation bg-bg font-sans font-medium text-ink antialiased">
         <script
           type="application/ld+json"

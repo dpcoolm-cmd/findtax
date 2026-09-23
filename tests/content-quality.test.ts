@@ -115,12 +115,15 @@ test("short articles do not acquire automatic length padding", () => {
   assert.doesNotMatch(posts, /buildLengthPadSection|countBlogBodyChars\(m\)/);
 });
 
-test("global layout preserves analytics and ownership without display ads", () => {
+test("global layout preserves analytics and loads approved AdSense auto ads once", () => {
   const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
   const footer = readFileSync(new URL("../components/Footer.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(layout, /CoupangRecommendBanner|<SiteAd|adsbygoogle\.js|130px/);
+  assert.doesNotMatch(layout, /CoupangRecommendBanner|<SiteAd|130px/);
   assert.doesNotMatch(footer, /<SiteAd/);
   assert.match(layout, /google-adsense-account/);
+  assert.match(layout, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=/);
+  assert.match(layout, /strategy="beforeInteractive"/);
+  assert.match(layout, /crossOrigin="anonymous"/);
   assert.match(layout, /google-tag-manager/);
   assert.match(footer, /\/editorial-policy/);
   assert.match(footer, /\/about/);
