@@ -12,7 +12,6 @@ const NAV_LINKS = [
   { href: "/region", label: "세무사 찾기" },
   { href: "/situation", label: "상황별 안내" },
   { href: "/blog", label: "세금 가이드" },
-  { href: "/consult", label: "상담 신청" },
 ] as const;
 
 function NavLink({

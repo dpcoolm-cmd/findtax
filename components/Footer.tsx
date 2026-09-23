@@ -5,7 +5,6 @@ const FOOTER_LINKS = [
   { href: "/region", label: "지역 세무사 찾기" },
   { href: "/calculator", label: "세금 계산기" },
   { href: "/blog", label: "세금 가이드" },
-  { href: "/consult", label: "상담 신청" },
   { href: "/register", label: "전문가 입점" },
   { href: "/about", label: "FindTax 소개" },
   { href: "/editorial-policy", label: "편집·수정 원칙" },
@@ -24,8 +23,7 @@ export function Footer() {
               <span className="text-xl font-black">FindTax</span>
             </div>
             <p className="mt-5 max-w-lg text-sm leading-7 text-white/65">
-              복잡한 세금 문제를 먼저 계산하고 비교한 뒤, 필요할 때 지역과 상황에 맞는
-              세무사에게 연결하는 세금 의사결정 플랫폼입니다.
+              사업과 세금 문제를 계산기와 실무 가이드로 이해하고 준비할 수 있도록 돕습니다.
             </p>
           </div>
 

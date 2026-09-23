@@ -36,8 +36,8 @@ export function BlogPostCta({
   description,
   href,
   calculatorType,
-  secondaryHref = "/consult",
-  secondaryLabel = "세무사 상담 받기",
+  secondaryHref,
+  secondaryLabel,
 }: BlogPostCtaProps) {
   return (
     <div className="mt-12 rounded-lg border border-line-strong bg-surface-muted p-6">
@@ -59,20 +59,22 @@ export function BlogPostCta({
         >
           계산기로 확인하기
         </Link>
-        <Link
-          href={secondaryHref}
-          onClick={() =>
-            trackBlogCta({
-              slug,
-              href: secondaryHref,
-              calculatorType,
-              target: secondaryHref.startsWith("/consult") ? "consult" : "calculator",
-            })
-          }
-          className="inline-flex min-h-12 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-bold text-neutral-900 transition hover:border-neutral-900"
-        >
-          {secondaryLabel}
-        </Link>
+        {secondaryHref && secondaryLabel ? (
+          <Link
+            href={secondaryHref}
+            onClick={() =>
+              trackBlogCta({
+                slug,
+                href: secondaryHref,
+                calculatorType,
+                target: "calculator",
+              })
+            }
+            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-bold text-neutral-900 transition hover:border-neutral-900"
+          >
+            {secondaryLabel}
+          </Link>
+        ) : null}
       </div>
     </div>
   );

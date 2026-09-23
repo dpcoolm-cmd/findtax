@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, BookOpen, Calculator, ChevronDown, MapPin } from "lucide-react";
+import { ArrowRight, BookOpen, Calculator, ChevronDown } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
 import { TaxDecisionWidget } from "@/components/TaxDecisionWidget";
 import { getBlogArticle } from "@/lib/blog/posts";
@@ -8,7 +8,7 @@ import { faqJsonLd } from "@/lib/seo/auto-content";
 import { absoluteUrl } from "@/lib/seo/urls";
 
 export const revalidate = 3600;
-const description = "1인사업자·부업러·온라인·글로벌 셀러가 세금과 신고 일정을 확인하고, 필요할 때 세무사에게 상담할 수 있는 FindTax입니다.";
+const description = "1인사업자·부업러·온라인·글로벌 셀러가 세금과 신고 일정을 확인하고, 무료 계산기와 실무 가이드로 준비하는 FindTax입니다.";
 export const metadata: Metadata = {
   title: "FindTax | 사업과 판매의 세금, 다음 할 일까지",
   description,
@@ -24,7 +24,6 @@ const STARTER_GUIDES = [
 const FAQS = [
   { question: "회원가입 없이 이용할 수 있나요?", answer: "계산기와 가이드는 회원가입 없이 이용할 수 있습니다. 세금 운영표 저장과 이어보기 등 일부 기능은 로그인 또는 저장 링크가 필요합니다." },
   { question: "계산 결과로 바로 신고해도 되나요?", answer: "계산 결과는 입력한 조건에 따른 참고용 추정치입니다. 공제·예외·신고연도에 따라 실제 세액이 달라질 수 있으므로 해당 계산기의 적용 범위와 공식 자료를 확인하세요." },
-  { question: "상담 신청과 세무 대행은 어떻게 다른가요?", answer: "상담 신청은 세무사 연결을 요청하는 단계입니다. 상담이나 신고 대행의 비용·범위는 담당 세무사에게 확인한 뒤 결정하세요. 신청만으로 유료 계약이 체결되지는 않습니다." },
 ];
 
 export default function HomePage() {
@@ -74,15 +73,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="consult-section" className="scroll-mt-32 border-y border-line bg-surface-muted" aria-labelledby="consult-title">
-        <div className="app-shell-frame grid gap-6 py-9 md:grid-cols-[1fr_auto] md:items-center">
+      <section className="border-y border-line bg-surface-muted" aria-labelledby="next-resources-title">
+        <div className="app-shell-frame flex flex-wrap items-center justify-between gap-5 py-9">
           <div>
-            <h2 id="consult-title" className="text-2xl font-bold text-ink">혼자 판단하기 어려운 부분이 있나요?</h2>
-            <p className="mt-3 text-sm leading-7 text-ink-muted">세무사에게 필요한 부분만 물어보세요. 비용과 진행 범위는 의뢰 전에 확인하세요.</p>
+            <h2 id="next-resources-title" className="text-2xl font-bold text-ink">내 상황에 맞는 계산과 가이드를 더 찾아보세요</h2>
+            <p className="mt-3 text-sm leading-7 text-ink-muted">필요한 숫자를 직접 비교하고, 신고 전에 확인할 내용을 읽어볼 수 있습니다.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/consult" className="btn-primary text-sm">상담 요청하기<ArrowRight size={17} aria-hidden /></Link>
-            <Link href="/region" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink underline underline-offset-4"><MapPin size={17} aria-hidden />지역별 세무사</Link>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/calculator" className="btn-primary inline-flex min-h-11 items-center gap-2 text-sm">전체 계산기<ArrowRight size={17} aria-hidden /></Link>
+            <Link href="/blog" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 text-sm font-semibold text-ink">세금 가이드<ArrowRight size={17} aria-hidden /></Link>
           </div>
         </div>
       </section>
