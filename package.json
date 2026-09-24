@@ -7,6 +7,7 @@
     "build": "next build",
     "test": "node --test tests/calculator-safety.test.ts tests/content-quality.test.ts tests/retirement-income.test.ts tests/savings-interest.test.ts",
     "content:audit": "node scripts/audit-blog-content.mjs",
+    "indexnow:submit": "node scripts/submit-indexnow.mjs",
     "typecheck": "tsc --noEmit",
     "start": "next start",
     "lint": "next lint"
