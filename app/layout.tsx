@@ -49,6 +49,7 @@ export const metadata: Metadata = {
     ...(googleVerification ? { google: googleVerification } : {}),
     other: {
       "naver-site-verification": "482df90ab22d80ffab80cbcac33a281c06d36fba",
+      "msvalidate.01": "24F769A34AC59F13E301A4DE880C0821",
       "google-adsense-account": adsenseAccount,
     },
   },
