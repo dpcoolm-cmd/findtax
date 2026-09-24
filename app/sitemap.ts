@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/calculator`, ...baseEntry, priority: 0.86 },
     { url: `${base}/calculator/jangbu`, ...baseEntry, priority: 0.72 },
     { url: `${base}/calculator/retirement-income`, ...baseEntry, lastModified: new Date("2026-09-06"), priority: 0.72 },
+    { url: `${base}/calculator/savings-interest`, ...baseEntry, lastModified: new Date("2026-09-24"), priority: 0.78 },
     { url: `${base}/region`, ...baseEntry, priority: 0.5 },
     { url: `${base}/about`, ...baseEntry, priority: 0.5 },
     { url: `${base}/editorial-policy`, ...baseEntry, priority: 0.4 },

@@ -148,11 +148,19 @@ export const CALCULATOR_DIRECTORY: CalculatorDirectoryItem[] = [
     href: "/calculator/retirement-income",
     category: "연금·재무",
   },
+  {
+    key: "savings-interest",
+    title: "예금·적금 세후 이자 계산기",
+    shortTitle: "예금·적금 이자",
+    description: "예치금이나 월 납입액, 금리와 기간을 바탕으로 일반과세 후 만기 예상액을 비교합니다.",
+    href: "/calculator/savings-interest",
+    category: "연금·재무",
+  },
 ];
 
 export const CALCULATOR_GROUPS = ["사업·부업", "부동산", "상속·증여", "근로", "연금·재무"] as const;
 export function calculatorGroup(item: CalculatorDirectoryItem): typeof CALCULATOR_GROUPS[number] {
-  if (["year-end-tax", "retirement-income"].includes(item.key)) return "연금·재무";
+  if (["year-end-tax", "retirement-income", "savings-interest"].includes(item.key)) return "연금·재무";
   if (["inheritance-gift", "gift-tax"].includes(item.key)) return "상속·증여";
   if (["severance-pay", "social-insurance", "weekly-holiday-pay"].includes(item.key)) return "근로";
   if (["transfer-tax", "acquisition-tax"].includes(item.key)) return "부동산";

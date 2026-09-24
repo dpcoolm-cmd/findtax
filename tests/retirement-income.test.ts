@@ -60,10 +60,10 @@ test("upper bounds and default scenarios remain finite", () => {
   }
 });
 
-test("calculator directory preserves existing links and groups the two pension tools", () => {
-  assert.equal(CALCULATOR_DIRECTORY.length, 14);
-  assert.equal(new Set(CALCULATOR_DIRECTORY.map(i => i.href)).size, 14);
-  assert.deepEqual(CALCULATOR_DIRECTORY.filter(i => calculatorGroup(i) === "연금·재무").map(i => i.key), ["year-end-tax", "retirement-income"]);
+test("calculator directory preserves existing links and groups financial tools", () => {
+  assert.equal(CALCULATOR_DIRECTORY.length, 15);
+  assert.equal(new Set(CALCULATOR_DIRECTORY.map(i => i.href)).size, 15);
+  assert.deepEqual(CALCULATOR_DIRECTORY.filter(i => calculatorGroup(i) === "연금·재무").map(i => i.key), ["year-end-tax", "retirement-income", "savings-interest"]);
 });
 test("retirement uses a distinct page, keeps private inputs out of tracking and URLs", () => {
   const page = readFileSync(new URL("../app/calculator/retirement-income/page.tsx", import.meta.url), "utf8");
