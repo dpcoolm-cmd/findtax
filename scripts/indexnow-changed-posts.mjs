@@ -19,7 +19,14 @@ function sourceFile(file, text) {
 function prop(object, name) {
   return object.properties.find((item) => ts.isPropertyAssignment(item) &&
     ((ts.isIdentifier(item.name) && item.name.text === name) ||
-     (ts.isStringLiteral(item.name) && item.name.text === name)));
+     (ts.isStringLiteral(item.name) && item.name.text === name)) ||
+    (ts.isShorthandPropertyAssignment(item) && item.name.text === name));
+}
+
+function propValue(item) {
+  if (ts.isPropertyAssignment(item)) return item.initializer;
+  if (ts.isShorthandPropertyAssignment(item)) return item.name;
+  return undefined;
 }
 
 function literal(node, constants) {
@@ -83,16 +90,16 @@ function articleMap(revision) {
     for (const node of array.elements) {
       if (!ts.isObjectLiteralExpression(node)) continue;
       const slugNode = prop(node, "slug");
-      const slug = literal(slugNode?.initializer, constants);
+      const slug = literal(propValue(slugNode), constants);
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
       const sourcesNode = prop(node, "sources")?.initializer;
       const sources = sourcesNode && ts.isArrayLiteralExpression(sourcesNode) ? sourcesNode.elements : [];
       const valid = sources.length > 0 && sources.every((sourceNode) => {
         if (!ts.isObjectLiteralExpression(sourceNode)) return false;
-        const title = literal(prop(sourceNode, "title")?.initializer, constants);
-        const urlValue = literal(prop(sourceNode, "url")?.initializer, constants);
-        const checkedAt = literal(prop(sourceNode, "checkedAt")?.initializer, constants);
+        const title = literal(propValue(prop(sourceNode, "title")), constants);
+        const urlValue = literal(propValue(prop(sourceNode, "url")), constants);
+        const checkedAt = literal(propValue(prop(sourceNode, "checkedAt")), constants);
         if (!title?.trim() || !checkedAt || !/^\d{4}-\d{2}-\d{2}$/.test(checkedAt)) return false;
         const date = new Date(`${checkedAt}T00:00:00Z`);
         if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== checkedAt) return false;
@@ -125,6 +132,9 @@ const current = articleMap(head);
 const previous = articleMap(base);
 const oldExtras = extrasMap(base);
 const newExtras = extrasMap(head);
+if (process.env.INDEXNOW_DEBUG === "1") {
+  console.log(`IndexNow debug: base articles=${previous.size}, current articles=${current.size}, current public=${[...current.values()].filter((article) => article.isPublic).length}, base SHA=${base}, deployed SHA=${head}`);
+}
 const changed = [];
 for (const [slug, article] of current) {
   if (!article.isPublic) continue;
