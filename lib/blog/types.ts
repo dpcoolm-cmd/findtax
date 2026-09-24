@@ -26,5 +26,6 @@ export type BlogArticle = {
   datePublished: string;
   dateModified: string;
   sources?: { title: string; url: string; checkedAt: string }[];
+  originalSource?: { title: string; url: string };
   revisionNote?: string;
 };

@@ -135,6 +135,14 @@ export default async function BlogPostPage({ params }: Props) {
         {article.revisionNote ? (
           <p className="mt-3 text-sm leading-6 text-neutral-600">이번 수정: {article.revisionNote}</p>
         ) : null}
+        {article.originalSource ? (
+          <p className="mt-2 text-sm leading-6 text-neutral-600">
+            원문과 작성 배경: {" "}
+            <a href={article.originalSource.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+              {article.originalSource.title}
+            </a>
+          </p>
+        ) : null}
         <p className="mt-8 text-lg leading-relaxed text-neutral-800">
           {article.intro}
         </p>

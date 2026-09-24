@@ -1,6 +1,7 @@
 import type { BlogArticle } from "@/lib/blog/types";
 
 const checkedAt = "2026-09-24";
+const NAVER_ORIGINAL = "https://blog.naver.com/PostView.naver?blogId=keepcalm2022&logNo=224405386200";
 const TAX_LAW = "https://law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1022787215";
 const NTS_FINANCIAL_INCOME = "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7906&mi=6470";
 const HEALTH_INSURANCE_RULE = "https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1032724725";
@@ -78,10 +79,11 @@ export const BLOG_ARTICLES_PART17: BlogArticle[] = [
     ],
     closing:
       "커버드콜 ETF 분배금은 상품과 지급 월에 따라 과세 비중이 달라질 수 있습니다. 국내주식형 일부 상품의 옵션 손익이 과세에서 제외될 수 있다는 설명을 모든 ETF에 적용하지 말고, 운용사 공지·과표기준가·증권사 세금 내역을 확인하세요. 투자 판단은 세금뿐 아니라 기초자산 손실과 상승 제한, 전체 수익률을 함께 비교해 결정해야 합니다.",
+    originalSource: { title: "네이버 블로그 원문: 커버드콜 ETF 분배금과 세금 정리", url: NAVER_ORIGINAL },
     datePublished: checkedAt,
-    dateModified: checkedAt,
+    dateModified: "2026-09-25",
     revisionNote:
-      "네이버 원문을 FindTax 독자용으로 재작성했습니다. 법령·국세청·건강보험 법령·운용사 안내를 2026-09-24 확인했고, 특정 국내주식형 상품의 과세 사례를 모든 커버드콜 ETF의 공통 규칙으로 확장하지 않았습니다.",
+      "네이버 원문 링크를 추가했습니다. FindTax 글은 네이버 원문을 바탕으로 재작성하고 법령·국세청·건강보험 법령·운용사 안내를 2026-09-24 확인했으며, 특정 국내주식형 상품의 과세 사례를 모든 커버드콜 ETF의 공통 규칙으로 확장하지 않았습니다.",
     sources: [
       { title: "소득세법 시행령 제26조의2 제4항", url: TAX_LAW, checkedAt },
       { title: "국세청 금융(이자·배당)소득 안내", url: NTS_FINANCIAL_INCOME, checkedAt },
