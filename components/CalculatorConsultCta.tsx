@@ -1,6 +1,7 @@
 "use client";
 
 import { ResultEmailCapture } from "@/components/ResultEmailCapture";
+import { PartnerFallbackOfferCard } from "@/components/monetization/PartnerFallbackOfferCard";
 import { TaxRulesBadge } from "@/components/TaxRulesBadge";
 import { useLeadExperience } from "@/components/lead-experience-context";
 import {
@@ -61,6 +62,7 @@ export function CalculatorConsultCta({
   const buttonLabel = buttonLabelOverride ?? dyn?.buttonLabel ?? bandCopy.buttonLabel;
 
   return (
+    <>
     <div className="rounded-lg border border-line bg-surface-muted px-6 py-6">
       <div className="flex flex-wrap items-center gap-2">
         <TaxRulesBadge />
@@ -93,5 +95,8 @@ export function CalculatorConsultCta({
         <ResultEmailCapture calculatorLabel={calculatorLabel} summary={resultSummary ?? null} />
       ) : null}
     </div>
+    {/* 보조 위젯(emailCapture=false)에는 광고를 중복 노출하지 않는다. */}
+    {!disabled && emailCapture ? <PartnerFallbackOfferCard /> : null}
+    </>
   );
 }

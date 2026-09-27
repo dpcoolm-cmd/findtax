@@ -23,6 +23,8 @@ export type AffiliateOffer = {
   slugs?: string[];
   /** slug·제목이 일치하는 글에 노출. */
   match?: RegExp;
+  /** 승인된 FindTax 파트너 세무사가 0명일 때만 노출(자체 매칭이 생기면 자동으로 빠짐). */
+  onlyWithoutPartners?: boolean;
   eyebrow: string;
   title: string;
   description: string;
@@ -139,6 +141,26 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     notice: "진평회계법인의 제휴 광고입니다. 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
     disclosureAction: "조회 신청",
   },
+  {
+    // 기투DB 세무사 상담(세무회계 문경). 승인 DB당 20,000원 + 계약 시 100,000원.
+    // 자체 세무사 파트너가 생기기 전까지의 임시 대체. 우선순위가 가장 낮다.
+    id: "tax-advisor-partner",
+    network: "keytoo",
+    model: "CPA",
+    advertiser: "세무회계 문경",
+    url: "https://fzy5p496.keytoodb.com",
+    enabled: true,
+    onlyWithoutPartners: true,
+    match: /기장|종합소득세|부가세|법인세|세무사|양도|상속|증여|프리랜서|사업자|간이과세|성실신고|원천세/,
+    eyebrow: "광고 · 제휴 세무사 사무소",
+    title: "지금 바로 세무사와 상담하고 싶다면",
+    description:
+      "FindTax 세무사 매칭은 파트너를 모집하고 있습니다. 그동안 제휴 세무사 사무소(세무회계 문경, 서울 강남)에 기장·신고·절세 상담을 신청할 수 있습니다. 비용과 업무 범위는 상담에서 직접 확인하세요.",
+    buttonLabel: "제휴 세무사에게 상담 신청하기",
+    notice:
+      "세무회계 문경의 제휴 광고입니다. FindTax 세무사 매칭과는 별개이며, 상담 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
+    disclosureAction: "상담 신청",
+  },
 ];
 
 function isLive(offer: AffiliateOffer): boolean {
@@ -150,9 +172,18 @@ export function getAffiliateOfferById(id: string): AffiliateOffer | undefined {
   return offer && isLive(offer) ? offer : undefined;
 }
 
-/** 글에 붙일 제휴 오퍼 1개. 명시한 slug가 regex 매칭보다 우선한다. */
-export function getAffiliateOfferForArticle(article: { slug: string; h1: string }): AffiliateOffer | undefined {
-  const live = AFFILIATE_OFFERS.filter(isLive);
+/** 파트너가 없을 때만 노출하는 대체 오퍼(계산기 결과 등에서 사용). */
+export const PARTNER_FALLBACK_OFFER_ID = "tax-advisor-partner";
+
+/**
+ * 글에 붙일 제휴 오퍼 1개. 명시한 slug가 regex 매칭보다 우선한다.
+ * noApprovedPartners가 true일 때만 onlyWithoutPartners 오퍼를 후보에 넣는다.
+ */
+export function getAffiliateOfferForArticle(
+  article: { slug: string; h1: string },
+  { noApprovedPartners = false }: { noApprovedPartners?: boolean } = {},
+): AffiliateOffer | undefined {
+  const live = AFFILIATE_OFFERS.filter((offer) => isLive(offer) && (!offer.onlyWithoutPartners || noApprovedPartners));
   const bySlug = live.find((offer) => offer.slugs?.includes(article.slug));
   if (bySlug) return bySlug;
   const subject = `${article.slug} ${article.h1}`;

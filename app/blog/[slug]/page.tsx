@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BlogPostCta } from "@/components/BlogPostCta";
 import { AffiliateDisclosure, AffiliateOfferCard } from "@/components/monetization/AffiliateOfferCard";
 import { getAffiliateOfferForArticle } from "@/config/affiliate-offers";
+import { hasNoApprovedPartners } from "@/lib/partner-availability";
 import { JsonLd } from "@/components/JsonLd";
 import { resolveBlogCategory } from "@/lib/blog/categories";
 import { getAllBlogSlugs, getBlogArticle, hasSourceReferences } from "@/lib/blog/posts";
@@ -64,7 +65,7 @@ export default async function BlogPostPage({ params }: Props) {
   const url = absoluteUrl(`/blog/${slug}`);
   const base = getBaseUrl();
   const cta = getBlogCta(article);
-  const affiliateOffer = getAffiliateOfferForArticle(article);
+  const affiliateOffer = getAffiliateOfferForArticle(article, { noApprovedPartners: await hasNoApprovedPartners() });
   const category = resolveBlogCategory(article);
 
   const articleJsonLd: Record<string, unknown> = {
