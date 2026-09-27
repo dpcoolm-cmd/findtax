@@ -86,13 +86,49 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     disclosureAction: "상담 신청",
   },
   {
-    // 기투DB '세금 환급/경정청구 무료조회'(승인 DB당 30,000원). 가입·링크 발급 후 url을 넣고 켠다.
+    // 기투DB 고용지원금·4대보험 환급(공인노무사 상담). 승인 DB당 20,000원 + 계약 시 50,000원.
+    id: "employment-subsidy",
+    network: "keytoo",
+    model: "CPA",
+    advertiser: "기투DB컨설팅(고용지원금·4대보험 환급)",
+    url: "https://tnhw4824.keytoodb.com",
+    enabled: true,
+    match: /고용지원금|4대보험|인건비|직원|두루누리/,
+    eyebrow: "광고 · 고용지원금·4대보험 점검",
+    title: "직원을 뒀다면 고용지원금과 4대보험 과오납부터 점검하세요",
+    description:
+      "청년·장애인 채용이나 고용 유지처럼 요건을 갖추면 고용지원금 대상이 될 수 있고, 4대보험은 신고 오류로 더 낸 금액이 있을 수 있습니다. 공인노무사 상담으로 해당 여부를 확인해 보세요. 지원 여부와 금액은 자료 확인 후 결정됩니다.",
+    buttonLabel: "고용지원금·4대보험 점검 신청하기",
+    notice: "기투DB컨설팅의 제휴 광고입니다. 상담 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
+    disclosureAction: "상담 신청",
+  },
+  {
+    // 기투DB 지원금·정책자금(행정사 상담). 승인 DB당 20,000원 + 계약 시 50,000원.
+    id: "policy-fund",
+    network: "keytoo",
+    model: "CPA",
+    advertiser: "기투DB컨설팅(정책자금·지원금)",
+    url: "https://pnh9z708.keytoodb.com",
+    enabled: true,
+    slugs: ["개인사업자-법인전환-유리한-기준", "사업자등록-세금-정리", "사업자-비용처리-되는것-안되는것-15가지"],
+    match: /정책자금|지원금|법인전환|창업/,
+    eyebrow: "광고 · 정책자금·지원금 진단",
+    title: "우리 사업장이 신청할 수 있는 정책자금·지원금이 있을까",
+    description:
+      "정책자금과 정부 지원금은 업력·업종·매출·지역에 따라 신청할 수 있는 곳이 다릅니다. 행정사 상담으로 해당 여부와 준비 서류를 먼저 확인해 보세요. 승인·한도·금리는 보장되지 않습니다.",
+    buttonLabel: "정책자금·지원금 진단 신청하기",
+    notice: "기투DB컨설팅의 제휴 광고입니다. 상담 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
+    disclosureAction: "상담 신청",
+  },
+  {
+    // 기투DB 경정청구(진평회계법인). 승인 DB당 20,000원 + 환급금의 7%.
+    // 2026-09-27 홍보 URL 발급했으나 '승인대기' — 기투DB 오픈톡에서 코드 승인을 받은 뒤 enabled를 켠다.
     // 사업자 대상 글에는 자체 세무사 매칭이 우선이므로 직장인·프리랜서 환급 글에만 붙인다.
     id: "tax-refund-check",
     network: "keytoo",
     model: "CPA",
-    advertiser: "세금 환급 조회 서비스",
-    url: "",
+    advertiser: "진평회계법인(경정청구)",
+    url: "https://0c7o4524.keytoodb.com",
     enabled: false,
     match: /경정청구|환급/,
     eyebrow: "광고 · 환급금 조회",
@@ -100,7 +136,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     description:
       "최근 5년 신고분 가운데 빠진 공제가 있으면 경정청구로 돌려받을 수 있습니다. 홈택스에서 직접 확인할 수도 있고, 조회 서비스를 이용할 수도 있습니다. 수수료 조건은 신청 전에 확인하세요.",
     buttonLabel: "환급금 조회하기",
-    notice: "제휴 광고입니다. 조회 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
+    notice: "진평회계법인의 제휴 광고입니다. 신청 시 FindTax가 제휴 수수료를 지급받습니다.",
     disclosureAction: "조회 신청",
   },
 ];
