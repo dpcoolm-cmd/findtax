@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogPostCta } from "@/components/BlogPostCta";
+import { AffiliateDisclosure, AffiliateOfferCard } from "@/components/monetization/AffiliateOfferCard";
+import { getAffiliateOfferForArticle } from "@/config/affiliate-offers";
 import { JsonLd } from "@/components/JsonLd";
 import { resolveBlogCategory } from "@/lib/blog/categories";
 import { getAllBlogSlugs, getBlogArticle, hasSourceReferences } from "@/lib/blog/posts";
@@ -62,6 +64,7 @@ export default async function BlogPostPage({ params }: Props) {
   const url = absoluteUrl(`/blog/${slug}`);
   const base = getBaseUrl();
   const cta = getBlogCta(article);
+  const affiliateOffer = getAffiliateOfferForArticle(article);
   const category = resolveBlogCategory(article);
 
   const articleJsonLd: Record<string, unknown> = {
@@ -132,6 +135,7 @@ export default async function BlogPostPage({ params }: Props) {
             출처 표시는 참고한 자료를 안내하며, 모든 내용의 최신성이나 세무사의 개별 검수를 보증하지 않습니다.
           </p>
         </div>
+        {affiliateOffer ? <AffiliateDisclosure offer={affiliateOffer} /> : null}
         {article.revisionNote ? (
           <p className="mt-3 text-sm leading-6 text-neutral-600">이번 수정: {article.revisionNote}</p>
         ) : null}
@@ -245,6 +249,7 @@ export default async function BlogPostPage({ params }: Props) {
           calculatorType={cta.calculatorType}
           {...(cta.calculatorType === "retirement_income" ? { secondaryHref: "/calculator/연말정산", secondaryLabel: "연금·IRP 절세 확인" } : {})}
         />
+        {affiliateOffer ? <AffiliateOfferCard offer={affiliateOffer} /> : null}
       </article>
       </div>
     </>
