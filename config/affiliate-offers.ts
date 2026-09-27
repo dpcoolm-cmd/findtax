@@ -57,7 +57,7 @@ export const AFFILIATE_OFFERS: AffiliateOffer[] = [
     advertiser: "법무법인 파로스",
     url: "https://appu.kr/?i=12539186",
     enabled: true,
-    match: /폐업|개인회생|파산|채무조정|빚/,
+    match: /폐업|개인회생|파산|채무조정|빚|체납/,
     eyebrow: "광고 · 개인회생·파산 상담",
     title: "사업을 정리한 뒤 갚기 어려운 빚이 남았다면",
     description:
