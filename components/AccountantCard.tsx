@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { TaxAccountantRow } from "@/lib/tax-accountants";
 import { surnameAvatarBgClass } from "@/lib/avatar-surname-color";
-import { taxAccountantProfilePath } from "@/lib/seo/urls";
+import { regionAccountantPath } from "@/lib/seo/urls";
 import { TrackedPhoneLink } from "@/components/TrackedPhoneLink";
 
 function telHref(phone: string | null) {
@@ -134,7 +134,7 @@ export function AccountantCard({ accountant }: { accountant: TaxAccountantRow })
             )}
           </div>
           <Link
-            href={taxAccountantProfilePath(accountant.id)}
+            href={regionAccountantPath(accountant.sido, accountant.sigungu, accountant.slug)}
             className="shrink-0 rounded-xl border border-neutral-200 bg-white px-3 py-3 text-lg leading-none shadow-sm transition-colors hover:border-brand hover:bg-brand-light/40"
             aria-label="상세보기"
             title="상세보기"
