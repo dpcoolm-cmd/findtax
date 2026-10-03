@@ -5,6 +5,7 @@ const FOOTER_LINKS = [
   { href: "/region", label: "지역 세무사 찾기" },
   { href: "/calculator", label: "세금 계산기" },
   { href: "/blog", label: "세금 가이드" },
+  { href: "/rss.xml", label: "새 가이드 RSS" },
   { href: "/register", label: "전문가 입점" },
   { href: "/about", label: "FindTax 소개" },
   { href: "/editorial-policy", label: "편집·수정 원칙" },

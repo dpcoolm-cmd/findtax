@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ArrowRight, BookOpen, Calculator, ChevronDown } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
 import { TaxDecisionWidget } from "@/components/TaxDecisionWidget";
-import { getBlogArticle } from "@/lib/blog/posts";
+import { BLOG_ARTICLES, getBlogArticle } from "@/lib/blog/posts";
 import { faqJsonLd } from "@/lib/seo/auto-content";
 import { absoluteUrl } from "@/lib/seo/urls";
 
@@ -21,6 +21,15 @@ const STARTER_GUIDES = [
   { slug: "부가세-신고-세무사-직접-판단", audience: "사업자·셀러", summary: "직접 신고와 세무사 의뢰, 자료 상태에 맞춰 판단하기." },
   { slug: "프리랜서-3점3-종합소득세-환급-추가납부", audience: "프리랜서·부업", summary: "이미 뗀 3.3%와 최종 세금이 다른 이유 알아보기." },
 ] as const;
+const QUICK_TOOLS = [
+  { href: "/calculator/retirement-income", title: "퇴직소득세 계산기", text: "퇴직급여와 근속기간으로 세후 수령액을 확인합니다." },
+  { href: "/calculator/savings-interest", title: "예금·적금 이자 계산기", text: "금리와 기간을 바꿔 세전·세후 이자를 비교합니다." },
+  { href: "/calculator/부업", title: "N잡·부업 세금", text: "부업 소득과 신고 준비사항을 확인합니다." },
+  { href: "/calculator/증여세", title: "증여세 계산기", text: "증여 조건을 입력하고 예상 세액을 살펴봅니다." },
+  { href: "/calculator/부가세", title: "부가세 계산기", text: "부가세 계산과 신고 준비를 시작합니다." },
+  { href: "/calculator/연말정산", title: "연말정산 계산기", text: "입력 조건에 따른 추정 결과와 적용 범위를 확인합니다." },
+] as const;
+const RECENT_GUIDES = [...BLOG_ARTICLES].sort((a, b) => b.datePublished.localeCompare(a.datePublished)).slice(0, 4);
 const FAQS = [
   { question: "회원가입 없이 이용할 수 있나요?", answer: "계산기와 가이드는 회원가입 없이 이용할 수 있습니다. 세금 운영표 저장과 이어보기 등 일부 기능은 로그인 또는 저장 링크가 필요합니다." },
   { question: "계산 결과로 바로 신고해도 되나요?", answer: "계산 결과는 입력한 조건에 따른 참고용 추정치입니다. 공제·예외·신고연도에 따라 실제 세액이 달라질 수 있으므로 해당 계산기의 적용 범위와 공식 자료를 확인하세요." },
@@ -52,6 +61,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section aria-labelledby="quick-tools-title" className="app-shell-frame py-10">
+        <h2 id="quick-tools-title" className="text-2xl font-bold text-ink">필요한 세금 계산기로 바로 가기</h2>
+        <p className="mt-3 text-sm leading-7 text-ink-muted">회원가입 없이 이용하세요. 결과는 참고용 추정치이며 계산기별 적용 범위와 예외를 함께 확인해 주세요.</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {QUICK_TOOLS.map(tool => <Link key={tool.href} href={tool.href} className="rounded-xl border border-line p-5 hover:border-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-dark">
+            <h3 className="font-bold text-ink">{tool.title}</h3><p className="mt-2 text-sm leading-6 text-ink-muted">{tool.text}</p>
+          </Link>)}
+        </div>
+      </section>
+
       <section aria-labelledby="starter-guides-title" className="app-shell-frame py-12 sm:py-16">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 id="starter-guides-title" className="flex items-center gap-3 text-2xl font-bold text-ink"><BookOpen size={23} aria-hidden />신고 전, 이 질문부터</h2>
@@ -70,6 +89,15 @@ export default function HomePage() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      <section aria-labelledby="recent-guides-title" className="app-shell-frame pb-12">
+        <h2 id="recent-guides-title" className="text-2xl font-bold text-ink">새로 나온 세금 가이드</h2>
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          {RECENT_GUIDES.map(article => <Link key={article.slug} href={`/blog/${article.slug}`} className="border-t border-line py-5 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-dark">
+            <h3 className="text-lg font-bold leading-7 text-ink">{article.h1}</h3><p className="mt-2 text-sm leading-6 text-ink-muted">{article.metaDescription}</p>
+          </Link>)}
         </div>
       </section>
 

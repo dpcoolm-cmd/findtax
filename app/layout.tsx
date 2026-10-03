@@ -25,6 +25,7 @@ const ogImage = process.env.NEXT_PUBLIC_OG_IMAGE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
+  alternates: { types: { "application/rss+xml": `${baseUrl}/rss.xml` } },
   title: {
     default: "FindTax | 세금 계산부터 세무사 연결까지",
     template: `%s | ${siteName}`,
