@@ -12,7 +12,7 @@ const description = "1인사업자·부업러·온라인·글로벌 셀러가 �
 export const metadata: Metadata = {
   title: "FindTax | 사업과 판매의 세금, 다음 할 일까지",
   description,
-  alternates: { canonical: absoluteUrl("/") },
+  alternates: { canonical: absoluteUrl("/"), types: { "application/rss+xml": absoluteUrl("/rss.xml") } },
   robots: { index: true, follow: true },
   openGraph: { url: absoluteUrl("/"), title: "FindTax | 사업과 판매의 세금, 다음 할 일까지", description },
 };
