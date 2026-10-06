@@ -7,7 +7,7 @@ import { trackSiteEvent } from "@/lib/site-track";
 function isBotLike() {
   const ua = navigator.userAgent.toLowerCase();
   return (
-    /googlebot|adsbot-google|bingbot|applebot|yeti|naverbot|daumoa|yandexbot|baiduspider|duckduckbot|headlesschrome|crawler|spider|semrush|ahrefsbot|slurp|bot\.html|compatible;\s*[a-z0-9_-]*bot/.test(
+    /googlebot|adsbot-google|bingbot|applebot|yeti|naverbot|daumoa|yandexbot|baiduspider|duckduckbot|headlesschrome|crawler|spider|semrush|ahrefsbot|slurp|bot\.html|claude\/|compatible;\s*[a-z0-9_-]*bot/.test(
       ua,
     ) || navigator.webdriver === true
   );
@@ -64,6 +64,8 @@ function getSessionAttribution(referrer: string, params: URLSearchParams) {
   return attribution;
 }
 
+const ENGAGED_MS = 10_000;
+
 export function SitePageTracker() {
   const pathname = usePathname();
 
@@ -78,18 +80,46 @@ export function SitePageTracker() {
     const sessionId = getStoredId(sessionStorage, "_ft_sid");
     const attribution = getSessionAttribution(referrer, params);
 
-    trackSiteEvent("page_view", {
+    const base = {
       path: pathname,
-      query: params.toString() || null,
-      title: document.title,
-      referrer: attribution.referrer,
       source: attribution.source,
       medium: attribution.medium,
       campaign: attribution.campaign,
       device: deviceType(),
       visitorId,
       sessionId,
+    };
+
+    trackSiteEvent("page_view", {
+      ...base,
+      query: params.toString() || null,
+      title: document.title,
+      referrer: attribution.referrer,
     });
+
+    // 실제 사람 방문 지표: 페이지에 10초 이상 머물고 스크롤·클릭·터치·키 입력이 있을 때 1회 기록.
+    // 한 페이지만 열고 바로 닫는 자동화 브라우저를 걸러내는 용도.
+    const startedAt = Date.now();
+    let interacted = false;
+    let sent = false;
+    const trySend = () => {
+      if (sent || !interacted || Date.now() - startedAt < ENGAGED_MS) return;
+      sent = true;
+      trackSiteEvent("page_engaged", { ...base, seconds: Math.round((Date.now() - startedAt) / 1000) });
+      cleanup();
+    };
+    const onInteract = () => {
+      interacted = true;
+      trySend();
+    };
+    const timer = window.setTimeout(trySend, ENGAGED_MS);
+    const events = ["scroll", "pointerdown", "keydown", "touchstart"] as const;
+    for (const name of events) window.addEventListener(name, onInteract, { passive: true });
+    function cleanup() {
+      window.clearTimeout(timer);
+      for (const name of events) window.removeEventListener(name, onInteract);
+    }
+    return cleanup;
   }, [pathname]);
 
   return null;

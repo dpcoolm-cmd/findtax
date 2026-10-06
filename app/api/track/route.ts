@@ -3,6 +3,7 @@ import { insertTrackingEvent } from "@/lib/tracking";
 
 const ALLOWED = new Set([
   "page_view",
+  "page_engaged",
   "phone_click",
   "lead_submit",
   "calculator_cta_click",
