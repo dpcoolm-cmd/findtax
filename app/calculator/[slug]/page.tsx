@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { AcquisitionTaxCalculator } from "@/components/calculators/AcquisitionTaxCalculator";
@@ -20,6 +20,7 @@ import { TaxRulesBadge } from "@/components/TaxRulesBadge";
 import { breadcrumbJsonLd, buildMainFaq, faqJsonLd } from "@/lib/seo/auto-content";
 import { CALCULATOR_SLUGS, isCalculatorSlug, type CalculatorSlug } from "@/lib/seo/calculators";
 import { absoluteUrl, calculatorPath } from "@/lib/seo/urls";
+import { CALCULATOR_SEO } from "@/lib/seo/calculator-seo";
 import type { Metadata } from "next";
 
 export const revalidate = 86400;
@@ -55,13 +56,13 @@ export async function generateMetadata({
   }
   const path = calculatorPath(slug);
   const canonical = absoluteUrl(path);
-  const desc = `${titles[slug]}로 세금이 달라지는 선택지를 먼저 비교하고, 필요할 때만 세무사와 마지막 판단을 맞춰보세요.`;
+  const seo = CALCULATOR_SEO[slug];
   return {
-    title: titles[slug],
-    description: desc,
+    title: seo.title,
+    description: seo.description,
     alternates: { canonical },
     robots: { index: true, follow: true },
-    openGraph: { url: canonical, title: titles[slug], description: desc },
+    openGraph: { url: canonical, title: seo.title, description: seo.description },
   };
 }
 
@@ -127,7 +128,8 @@ export default async function CalculatorPage({
 
   const path = calculatorPath(slug);
   const url = absoluteUrl(path);
-  const faqs = buildMainFaq();
+  const seo = CALCULATOR_SEO[slug];
+  const faqs = [...seo.faqs, ...buildMainFaq()];
 
   return (
     <>
@@ -139,6 +141,19 @@ export default async function CalculatorPage({
         ])}
       />
       <JsonLd data={faqJsonLd(faqs, url)} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: titles[slug],
+          url,
+          description: seo.description,
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          inLanguage: "ko-KR",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
+        }}
+      />
 
       <div className="app-shell-frame pb-24 pt-10 md:pb-28">
         <div className="space-y-10">
@@ -161,7 +176,7 @@ export default async function CalculatorPage({
                 <h1 className="max-w-3xl text-4xl font-extrabold leading-tight md:text-5xl">{titles[slug]}</h1>
               </div>
               <p className="max-w-xl pt-2 text-left text-ink-muted lg:text-right">
-                숫자를 계산하는 데서 멈추지 않고, 세금이 달라지는 선택지를 먼저 비교한 뒤 실제 신고 전 마지막 판단까지 이어지도록 구성했습니다.
+                {seo.description}
               </p>
             </div>
 
