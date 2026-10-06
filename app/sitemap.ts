@@ -7,6 +7,8 @@ import {
   situationPath,
 } from "@/lib/seo/urls";
 import { TAX_SITUATIONS } from "@/lib/situations";
+import { listIndexableRegions } from "@/lib/seo/region-index";
+import { regionSidoPath, regionSigunguPath } from "@/lib/seo/urls";
 
 export const revalidate = 86400;
 
@@ -56,6 +58,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...baseEntry,
       priority: 0.72,
     });
+  }
+
+  // 공개 등록 사무소가 충분한 시·군·구와 그 시·도만 넣는다(개별 세무사 프로필은 제외).
+  const regions = await listIndexableRegions();
+  for (const sido of new Set(regions.map((r) => r.sido))) {
+    urls.push({ url: `${base}${regionSidoPath(sido)}`, ...baseEntry, priority: 0.6 });
+  }
+  for (const r of regions) {
+    urls.push({ url: `${base}${regionSigunguPath(r.sido, r.sigungu)}`, ...baseEntry, priority: 0.6 });
   }
 
   return urls;

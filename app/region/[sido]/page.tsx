@@ -14,6 +14,7 @@ import { getSigunguBySido } from "@/lib/regions";
 import { absoluteUrl, regionSidoPath, regionSigunguPath, situationPath } from "@/lib/seo/urls";
 import { TAX_SITUATIONS } from "@/lib/situations";
 import { listActiveRegionPairs } from "@/lib/tax-accountants";
+import { listRegionOfficeCounts } from "@/lib/seo/region-index";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -33,16 +34,22 @@ export async function generateMetadata({
   const sido = decodeURIComponent(raw);
   const path = regionSidoPath(sido);
   const canonical = absoluteUrl(path);
-  const desc = `${sido} 지역 세무사 목록과 무료 상담 연결 정보를 확인할 수 있습니다.`;
+  const counts = (await listRegionOfficeCounts()).filter((r) => r.sido === sido);
+  const total = counts.reduce((sum, r) => sum + r.offices, 0);
+  const title = total > 0 ? `${sido} 세무사 사무소 ${total}곳, 시·군·구별 찾기` : `${sido} 세무사 찾기`;
+  const desc =
+    total > 0
+      ? `${sido} ${counts.length}개 시·군·구에 공개 등록된 세무사 사무소 ${total}곳을 지역별로 정리했습니다. 구·군을 고르면 사무소 위치와 연락처를 볼 수 있습니다.`
+      : `${sido} 지역 세무사 목록과 상담 연결 정보를 확인할 수 있습니다.`;
 
   return {
-    title: `${sido} 세무사 찾기`,
+    title,
     description: desc,
     alternates: { canonical },
-    robots: { index: false, follow: true },
+    robots: { index: total > 0, follow: true },
     openGraph: {
       url: canonical,
-      title: `${sido} 세무사 찾기`,
+      title,
       description: desc,
     },
   };
@@ -60,7 +67,11 @@ export default async function RegionSidoPage({
   const sido = decodeURIComponent(raw);
   const fromSituation = typeof query.situation === "string" ? query.situation : null;
 
-  const activeRows = await listActiveRegionPairs();
+  const [activeRows, officeCounts] = await Promise.all([listActiveRegionPairs(), listRegionOfficeCounts()]);
+  const officesByDistrict = new Map(
+    officeCounts.filter((r) => r.sido === sido).map((r) => [r.sigungu, r.offices]),
+  );
+  const totalOffices = [...officesByDistrict.values()].reduce((a, b) => a + b, 0);
   const activeDistricts = activeRows
     .filter((row) => row.sido === sido)
     .map((row) => row.sigungu);
@@ -105,7 +116,9 @@ export default async function RegionSidoPage({
 
         <h1 className="mt-4 text-2xl font-bold text-brand sm:text-3xl">{sido} 세무사 찾기</h1>
         <p className="mt-2 text-neutral-600">
-          실제 등록된 지역만 우선 보여드립니다. 구·군을 선택하면 해당 지역 세무사와 상담 요청 흐름까지 확인할 수 있어요.
+          {totalOffices > 0
+            ? `${sido}에는 한국세무사회 공개 등록 기준 세무사 사무소 ${totalOffices}곳이 있습니다. 구·군을 선택하면 사무소 위치와 연락처를 볼 수 있어요.`
+            : "실제 등록된 지역만 우선 보여드립니다. 구·군을 선택하면 해당 지역 세무사와 상담 요청 흐름까지 확인할 수 있어요."}
         </p>
         {matchedSituation ? (
           <div className="mt-4 rounded-xl border border-brand/20 bg-brand-light/40 px-4 py-4 text-sm text-neutral-700">
@@ -128,6 +141,9 @@ export default async function RegionSidoPage({
                   className="block rounded-xl border border-brand-light bg-brand-light/40 px-4 py-3 text-sm font-medium text-brand shadow-sm hover:bg-brand-light"
                 >
                   {district}
+                  {officesByDistrict.get(district) ? (
+                    <span className="ml-1 text-xs font-normal text-neutral-500">{officesByDistrict.get(district)}곳</span>
+                  ) : null}
                 </Link>
               </li>
             ))}

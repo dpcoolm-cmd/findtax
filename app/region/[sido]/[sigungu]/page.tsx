@@ -21,6 +21,7 @@ import {
   NO_ACCOUNTANTS_FALLBACK_MESSAGE,
 } from "@/lib/tax-accountants";
 import { listVerifiedPartners } from "@/lib/partners-directory";
+import { isRegionIndexable, summarizeRegion } from "@/lib/seo/region-insights";
 
 export const revalidate = 86400;
 
@@ -39,16 +40,27 @@ export async function generateMetadata({
   const sigungu = decodeURIComponent(rg);
   const path = regionSigunguPath(sido, sigungu);
   const canonical = absoluteUrl(path);
-  const desc = `${sido} ${sigungu} 지역 세무사 목록과 상담 요청 정보를 확인할 수 있습니다.`;
+  const { accountants } = await listTaxAccountants({ sido, sigungu });
+  const summary = summarizeRegion(accountants);
+  const dongs = summary.topDongs.slice(0, 3).map((d) => d.dong).join("·");
+  const title =
+    summary.officeCount > 0
+      ? `${sigungu} 세무사 사무소 ${summary.officeCount}곳 위치·연락처 (${sido})`
+      : `${sido} ${sigungu} 세무사 찾기`;
+  const desc =
+    summary.officeCount > 0
+      ? `${sido} ${sigungu}에 공개 등록된 세무사 사무소 ${summary.officeCount}곳의 위치와 연락처를 정리했습니다.${dongs ? ` ${dongs} 등에 많이 모여 있으며,` : ""} 기장·신고 상담 전 확인할 점도 함께 안내합니다.`
+      : `${sido} ${sigungu} 지역 세무사 목록과 상담 요청 정보를 확인할 수 있습니다.`;
 
   return {
-    title: `${sido} ${sigungu} 세무사 찾기`,
+    title,
     description: desc,
     alternates: { canonical },
-    robots: { index: false, follow: true },
+    // 공개 등록 사무소가 충분한 지역만 색인한다. 개별 세무사 프로필은 계속 noindex.
+    robots: { index: isRegionIndexable(summary), follow: true },
     openGraph: {
       url: canonical,
-      title: `${sido} ${sigungu} 세무사 찾기`,
+      title,
       description: desc,
     },
   };
@@ -82,7 +94,25 @@ export default async function RegionSigunguPage({
     listTaxAccountants({ sido, sigungu }),
     listVerifiedPartners({ sido, sigungu }),
   ]);
-  const faqs = buildRegionSigunguFaq(sido, sigungu);
+  const summary = summarizeRegion(res.accountants);
+  const faqs = [
+    ...(summary.officeCount > 0
+      ? [
+          {
+            question: `${sido} ${sigungu}에는 세무사 사무소가 몇 곳 있나요?`,
+            answer: `한국세무사회 공개 등록 정보를 기준으로 ${summary.officeCount}곳(세무사 ${summary.accountantCount}명)이 확인됩니다.${
+              summary.topDongs.length
+                ? ` ${summary.topDongs
+                    .slice(0, 3)
+                    .map((d) => `${d.dong} ${d.offices}곳`)
+                    .join(", ")} 순으로 많습니다.`
+                : ""
+            } 이전·폐업 등으로 실제와 다를 수 있으니 방문 전 사무소에 확인하세요.`,
+          },
+        ]
+      : []),
+    ...buildRegionSigunguFaq(sido, sigungu),
+  ];
   const links = internalLinksForSigungu(sido, sigungu);
 
   return (
@@ -112,6 +142,41 @@ export default async function RegionSigunguPage({
         <h1 className="mt-4 text-2xl font-bold text-brand sm:text-3xl">
           {sido} {sigungu} 세무사
         </h1>
+        {summary.officeCount > 0 ? (
+          <section aria-labelledby="region-summary" className="mt-4 rounded-xl border border-line bg-white p-5">
+            <h2 id="region-summary" className="text-base font-bold text-ink">
+              {sigungu} 세무사 한눈에 보기
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-neutral-700">
+              {sido} {sigungu}에는 공개 등록된 세무사 사무소가 <strong>{summary.officeCount}곳</strong>(세무사{" "}
+              {summary.accountantCount}명) 있습니다.
+              {summary.topDongs.length > 0 ? ` 사무소는 ${summary.topDongs[0]!.dong}에 가장 많이 모여 있습니다.` : null}
+            </p>
+            {summary.topDongs.length > 1 ? (
+              <table className="mt-3 w-full text-left text-sm">
+                <caption className="sr-only">{sigungu} 법정동별 세무사 사무소 수</caption>
+                <thead>
+                  <tr className="border-b border-line text-neutral-500">
+                    <th className="py-1.5 font-medium">법정동</th>
+                    <th className="py-1.5 font-medium">사무소 수</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {summary.topDongs.map((d) => (
+                    <tr key={d.dong} className="border-b border-line/60">
+                      <td className="py-1.5">{d.dong}</td>
+                      <td className="py-1.5">{d.offices}곳</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : null}
+            <p className="mt-3 text-xs leading-5 text-neutral-500">
+              한국세무사회 공개 등록 정보를 바탕으로 정리했습니다. 이전·폐업 등으로 실제와 다를 수 있으니 방문 전 사무소에 확인하세요.
+              기장료·상담 비용은 사무소마다 다르므로 업종·매출 규모를 알려 주고 견적을 비교하는 것이 좋습니다.
+            </p>
+          </section>
+        ) : null}
         {matchedSituation ? (
           <div className="mt-4 rounded-xl border border-brand/20 bg-brand-light/40 px-4 py-4 text-sm text-neutral-700">
             <p className="font-semibold text-brand">{matchedSituation.label} 흐름에서 이어진 페이지예요.</p>
