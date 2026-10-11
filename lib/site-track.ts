@@ -95,6 +95,7 @@ function googleAnalyticsPayload(eventType: string, payload: Record<string, unkno
 }
 
 function isInternalTraffic(): boolean {
+  if (typeof window !== "undefined" && ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)) return true;
   try {
     return typeof window !== "undefined" && window.localStorage.getItem("_ft_internal") === "1";
   } catch {
@@ -121,7 +122,7 @@ export function trackSiteEvent(eventType: string, payload: Record<string, unknow
     keepalive: true,
     body: JSON.stringify({
       eventType,
-      payload,
+      payload: { ...(typeof window !== "undefined" ? { path: window.location.pathname } : {}), ...payload },
     }),
   }).catch(() => undefined);
 }

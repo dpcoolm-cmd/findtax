@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { insertTrackingEvent } from "@/lib/tracking";
+import { isBotUserAgent, isLocalRequest } from "@/lib/traffic-quality";
 
 const ALLOWED = new Set([
   "page_view",
@@ -33,6 +34,9 @@ const ALLOWED = new Set([
 ]);
 
 export async function POST(req: Request) {
+  if (isLocalRequest(req) || isBotUserAgent(req.headers.get("user-agent"))) {
+    return NextResponse.json({ ok: true, tracked: false, reason: "test_or_bot" });
+  }
   let body: unknown;
   try {
     body = await req.json();
