@@ -59,20 +59,12 @@ export function ComprehensiveIncomeTaxCalculator() {
 
   return (
     <div className="space-y-6">
-      <IncomeFilingDecisionCalculator />
-      <AdvisorCostBenefitCalculator
-        contextLabel="종합소득세"
-        defaultSituation="income_tax"
-        defaultTaxRatePercent={15}
-        defaultAdvisorFeeManwon="50"
-        defaultMissedDeductionManwon="300"
-      />
       <section className="rounded-xl bg-white p-4 shadow-md sm:p-6">
         <div className="mb-5 border-b border-neutral-100 pb-4">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B7791F]">Income tax amount</p>
           <h2 className="mt-2 text-2xl font-bold text-neutral-950">종합소득세 산출세액 간이 계산</h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600">
-            신고 판단 후 과세표준 기준 산출세액과 유효세율을 참고용으로 확인합니다.
+            과세표준을 입력하면 즉시 산출세액과 유효세율을 참고용으로 확인합니다.
           </p>
         </div>
       <label className="block text-sm font-medium text-neutral-800">
@@ -95,7 +87,7 @@ export function ComprehensiveIncomeTaxCalculator() {
           placeholder="소득공제 모두 뺀 금액 입력 (예: 32000000)"
         />
       </label>
-      {result.error ? <p className="mt-2 text-sm text-red-600">{result.error}</p> : null}
+      {result.error ? <p role="alert" className="mt-2 text-sm text-red-600">{result.error}</p> : null}
       <p className="mt-2 text-xs text-neutral-500">
         소득세법 시행령 [별표 4] 산출세율·누진공제 기준 간이 산출({COMPREHENSIVE_INCOME_TAX_REFERENCE_YEAR}년). 세액공제·분리과세·조세특례 미반영.
       </p>
@@ -151,6 +143,19 @@ export function ComprehensiveIncomeTaxCalculator() {
         estimatedTaxWon={result.data?.tax ?? null}
       />
       </section>
+      <details className="rounded-xl border border-line bg-white p-5">
+        <summary className="min-h-11 cursor-pointer font-bold">선택: 신고 복잡도와 세무사 비용 비교</summary>
+        <div className="mt-5 space-y-6">
+      <IncomeFilingDecisionCalculator />
+      <AdvisorCostBenefitCalculator
+        contextLabel="종합소득세"
+        defaultSituation="income_tax"
+        defaultTaxRatePercent={15}
+        defaultAdvisorFeeManwon="50"
+        defaultMissedDeductionManwon="300"
+      />
+        </div>
+      </details>
     </div>
   );
 }

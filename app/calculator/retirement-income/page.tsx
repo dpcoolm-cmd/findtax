@@ -1,3 +1,4 @@
+import { CalculatorSearchGuide } from "@/components/CalculatorSearchGuide";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { RetirementIncomeCalculator } from "@/components/calculators/RetirementIncomeCalculator";
@@ -21,7 +22,8 @@ export default function RetirementIncomePage() {
       <nav className="text-sm text-ink-muted" aria-label="현재 위치"><Link href="/calculator" className="underline underline-offset-4">계산기</Link> / 연금·재무</nav>
       <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-4xl">내 퇴직연금은<br />월급으로 몇 년 나올까?</h1>
       <p className="mb-7 mt-4 text-base leading-7 text-ink-muted">퇴직 후 부족한 생활비, 준비한 자산으로 얼마나 채울 수 있을까요?</p>
-      <RetirementIncomeCalculator />
+      <div id="calculator-input" className="scroll-mt-24"><RetirementIncomeCalculator /></div>
+      <div className="mt-8"><CalculatorSearchGuide slug="retirement-income" /></div>
       <section className="mt-10 border-t border-line pt-7">
         <h2 className="text-xl font-bold">계산 근거와 한계</h2>
         <p className="mt-3 text-sm text-ink-muted">공식자료 확인 {RETIREMENT_REFERENCE.lastVerifiedAt} · 세액 산출이 아닌 현금흐름 시뮬레이션</p>

@@ -1,3 +1,5 @@
+import { CalculatorJourney } from "@/components/CalculatorJourney";
+import { CalculatorSearchGuide } from "@/components/CalculatorSearchGuide";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
@@ -27,7 +29,8 @@ export default function SavingsInterestPage() {
       <nav className="text-sm text-ink-muted" aria-label="현재 위치"><Link href="/calculator" className="underline underline-offset-4">계산기</Link> / 연금·재무</nav>
       <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-4xl">예금·적금 이자 계산기</h1>
       <p className="mb-7 mt-4 text-base leading-7 text-ink-muted">가입 금액과 기간, 금리를 넣고 세금을 뺀 뒤 만기에 받을 금액을 비교해 보세요.</p>
-      <SavingsInterestCalculator />
+      <div id="calculator-input" className="scroll-mt-24"><CalculatorJourney slug="savings-interest"><SavingsInterestCalculator /></CalculatorJourney></div>
+      <div className="mt-8"><CalculatorSearchGuide slug="savings-interest" /></div>
       <section className="mt-10 border-t border-line pt-7">
         <h2 className="text-xl font-bold">계산 방식과 적용 범위</h2>
         <p className="mt-3 text-sm leading-7">예금은 예치 원금에 연이율과 가입 개월 수를 곱해 단리로 계산합니다. 적금은 매월 초 납입한다고 가정하고, 각 납입액이 실제 예치된 개월 수만큼 이자를 얻도록 계산합니다. 일반과세 예상액은 이자소득세 14%와 지방소득세(소득세액의 10%)를 합친 15.4%를 세전 이자에 적용합니다.</p>

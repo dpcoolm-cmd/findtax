@@ -71,7 +71,7 @@ export function SavingsInterestCalculator() {
 
       {error ? <p role="alert" className="mt-4 text-sm font-medium text-red-700">{error}</p> : null}
       {result ? (
-        <section aria-live="polite" aria-label="예상 만기 결과" className="mt-6 rounded-xl bg-primary p-5 text-white sm:p-6">
+        <section data-calculator-result aria-live="polite" aria-label="예상 만기 결과" className="mt-6 rounded-xl bg-primary p-5 text-white sm:p-6">
           <p className="text-sm font-semibold text-white/75">예상 세후 만기 수령액</p>
           <p className="mt-1 text-3xl font-extrabold tabular-nums">{won(result.maturityAmountWon)}</p>
           <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">

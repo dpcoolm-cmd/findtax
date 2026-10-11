@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { CalculatorSearchGuide } from "@/components/CalculatorSearchGuide";
+import { CalculatorJourney } from "@/components/CalculatorJourney";
 import { notFound } from "next/navigation";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { AcquisitionTaxCalculator } from "@/components/calculators/AcquisitionTaxCalculator";
@@ -129,7 +131,7 @@ export default async function CalculatorPage({
   const path = calculatorPath(slug);
   const url = absoluteUrl(path);
   const seo = CALCULATOR_SEO[slug];
-  const faqs = [...seo.faqs, ...buildMainFaq()];
+  const faqs = [...seo.faqs, buildMainFaq()[2]];
 
   return (
     <>
@@ -180,6 +182,11 @@ export default async function CalculatorPage({
               </p>
             </div>
 
+            <nav aria-label="계산기 바로가기" className="flex flex-wrap gap-3">
+              <a href="#calculator-input" className="btn-primary min-h-11">계산 입력으로 바로가기</a>
+              <a href="#calculator-guide" className="btn-secondary min-h-11">준비자료·사용법 보기</a>
+            </nav>
+
             <div className="rounded-lg border border-line bg-surface-muted p-5">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <TaxRulesBadge />
@@ -223,9 +230,11 @@ export default async function CalculatorPage({
             </div>
           </section>
 
-          <div>
-            <CalculatorBySlug slug={slug} />
+          <div id="calculator-input" className="scroll-mt-24">
+            <CalculatorJourney slug={slug}><CalculatorBySlug slug={slug} /></CalculatorJourney>
           </div>
+
+          <CalculatorSearchGuide slug={slug} />
 
           <section className="rounded-lg border border-line bg-surface-muted p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
             <div>

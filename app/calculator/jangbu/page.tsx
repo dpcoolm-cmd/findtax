@@ -1,3 +1,5 @@
+import { CalculatorJourney } from "@/components/CalculatorJourney";
+import { CalculatorSearchGuide } from "@/components/CalculatorSearchGuide";
 import Link from "next/link";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { BookkeepingFeeCalculator } from "@/components/calculators/BookkeepingFeeCalculator";
@@ -15,7 +17,7 @@ const path = "/calculator/jangbu";
 const desc = "업종·매출 규모·직원 수에 따른 적정 기장료 범위를 확인하고, 현재 내고 있는 기장료가 적정한지 세무사에게 확인받아 보세요.";
 
 export const metadata: Metadata = {
-  title,
+  title: "기장료 계산기 — 업종·연매출별 월 비용 추정",
   description: desc,
   alternates: { canonical: absoluteUrl(path) },
   robots: { index: true, follow: true },
@@ -24,10 +26,13 @@ export const metadata: Metadata = {
 
 export default function JangbuCalculatorPage() {
   const url = absoluteUrl(path);
-  const faqs = buildMainFaq();
+  const faqs = [buildMainFaq()[2]];
 
   return (
     <>
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "WebApplication", name: title, url,
+        description: desc, applicationCategory: "FinanceApplication", operatingSystem: "Web", inLanguage: "ko-KR",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" } }} />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "홈", url: "/" },
@@ -63,7 +68,8 @@ export default function JangbuCalculatorPage() {
 
           {/* Calculator */}
           <div>
-            <BookkeepingFeeCalculator />
+            <div id="calculator-input" className="scroll-mt-24"><CalculatorJourney slug="jangbu"><BookkeepingFeeCalculator /></CalculatorJourney></div>
+      <div className="mt-8"><CalculatorSearchGuide slug="jangbu" /></div>
           </div>
 
           <section className="rounded-3xl bg-bg-muted p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">

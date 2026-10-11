@@ -356,7 +356,7 @@ export function BookkeepingFeeCalculator() {
 
       {/* Result */}
       {result ? (
-        <div className="mt-6 space-y-4">
+        <div data-calculator-result role="status" aria-live="polite" className="mt-6 space-y-4">
           {/* Main result */}
           <div className="rounded-xl border border-brand/20 bg-brand/5 p-5">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand/70">예상 기장료 범위</p>

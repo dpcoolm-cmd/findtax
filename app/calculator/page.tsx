@@ -4,6 +4,7 @@ import { IndustryTaxDiagnosisHub } from "@/components/IndustryTaxDiagnosisHub";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbJsonLd } from "@/lib/seo/auto-content";
 import { absoluteUrl } from "@/lib/seo/urls";
+import { CALCULATOR_DIRECTORY } from "@/lib/seo/calculators";
 
 export const revalidate = 86400;
 
@@ -26,6 +27,8 @@ export const metadata: Metadata = {
 export default function CalculatorHubPage() {
   return (
     <>
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "ItemList", name: title,
+        itemListElement: CALCULATOR_DIRECTORY.map((item, index) => ({ "@type": "ListItem", position: index + 1, name: item.title, url: absoluteUrl(item.href) })) }} />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "홈", url: "/" },

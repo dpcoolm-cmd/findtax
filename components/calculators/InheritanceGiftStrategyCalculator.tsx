@@ -333,7 +333,7 @@ export function InheritanceGiftStrategyCalculator() {
 
       {result.data ? (
         <>
-          <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div data-calculator-result role="status" aria-live="polite" className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
             <p className="text-lg font-bold text-neutral-900 sm:text-xl">{headline}</p>
             <p className="mt-3 rounded-lg bg-neutral-50 px-3 py-2 text-sm font-medium text-neutral-800">
               {result.data.summary}

@@ -15,7 +15,10 @@ export function CalculatorDirectory({
   dark?: boolean;
 }) {
   const [group, setGroup] = useState("전체");
-  const items = CALCULATOR_DIRECTORY.filter(item => group === "전체" || calculatorGroup(item) === group);
+  const [query, setQuery] = useState("");
+  const normalized = query.trim().replace(/\s+/g, "").toLowerCase();
+  const items = CALCULATOR_DIRECTORY.filter(item => (group === "전체" || calculatorGroup(item) === group)
+    && `${item.title}${item.shortTitle}${item.description}`.replace(/\s+/g, "").toLowerCase().includes(normalized));
   return (
     <section id="calculators" className={dark ? "bg-primary text-white" : "bg-white"}>
       <div className="app-shell-frame app-section">
@@ -33,7 +36,14 @@ export function CalculatorDirectory({
           </p>
         </div>
 
-        <div role="group" aria-label="계산기 분야" className="mt-8 flex flex-wrap gap-2">
+        <label className="mt-7 block max-w-xl text-sm font-semibold">
+          계산기 이름·목적으로 찾기
+          <input type="search" name="calculatorSearch" autoComplete="off" value={query} onChange={event => setQuery(event.target.value)}
+            placeholder="예: 부가세, IRP, 적금…" className="mt-2 min-h-12 w-full rounded-lg border border-line bg-white px-4 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary" />
+        </label>
+        <p role="status" className="mt-3 text-sm">{items.length}개 계산기</p>
+        {items.length === 0 && <p className="mt-3 text-sm">검색어를 줄이거나 다른 분야를 선택해 보세요.</p>}
+        <div role="group" aria-label="계산기 분야" className="mt-5 flex flex-wrap gap-2">
           {["전체", ...CALCULATOR_GROUPS].map(label => <button key={label} type="button" aria-pressed={group === label} onClick={() => setGroup(label)}
             className={`min-h-11 rounded-lg border px-4 py-2 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${group === label ? "border-primary bg-primary text-white" : "border-line bg-white text-ink"}`}>{label}</button>)}
         </div>

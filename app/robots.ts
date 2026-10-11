@@ -15,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: [`${base}/sitemap.xml`, `${base}/calculator-sitemap.xml`],
     host: (() => {
       try {
         return new URL(base).host;

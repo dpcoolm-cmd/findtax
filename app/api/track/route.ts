@@ -8,6 +8,7 @@ const ALLOWED = new Set([
   "lead_submit",
   "calculator_cta_click",
   "calculator_result_view",
+  "calculator_result_visible",
   "calculator_view",
   "calculator_start",
   "calculator_complete",

@@ -64,20 +64,12 @@ export function VatCalculator() {
 
   return (
     <div className="space-y-6">
-      <VatFilingDecisionCalculator />
-      <AdvisorCostBenefitCalculator
-        contextLabel="부가세"
-        defaultSituation="income_tax"
-        defaultTaxRatePercent={10}
-        defaultAdvisorFeeManwon="30"
-        defaultMissedDeductionManwon="100"
-      />
       <section className="rounded-xl bg-white p-4 shadow-md sm:p-6">
         <div className="mb-5 border-b border-neutral-100 pb-4">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B7791F]">VAT amount</p>
           <h2 className="mt-2 text-2xl font-bold text-neutral-950">부가세 금액 간이 계산</h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600">
-            신고 판단 후 실제 거래 금액의 공급가액·부가세·합계금액을 빠르게 역산합니다.
+            거래 금액을 입력하면 즉시 공급가액·부가세·합계금액을 빠르게 역산합니다.
           </p>
         </div>
       <label className="block text-sm font-medium text-neutral-800">
@@ -117,13 +109,15 @@ export function VatCalculator() {
         </span>
         <input
           inputMode="numeric"
+          name="transactionAmount"
+          autoComplete="off"
           className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2.5"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          placeholder="10% 세율 적용"
+          placeholder="예: 1,000,000"
         />
       </label>
-      {result.err ? <p className="mt-2 text-sm text-red-600">{result.err}</p> : null}
+      {result.err ? <p role="alert" className="mt-2 text-sm text-red-600">{result.err}</p> : null}
       <p className="mt-2 text-xs text-neutral-500">
         일반 과세 10% 간이 계산. 영세·면세·매입세액공제·간이과세·불공제 미반영.
       </p>
@@ -169,6 +163,19 @@ export function VatCalculator() {
         resultBand={ctaBand}
       />
       </section>
+      <details className="rounded-xl border border-line bg-white p-5">
+        <summary className="min-h-11 cursor-pointer font-bold">선택: 신고 복잡도와 세무사 비용 비교</summary>
+        <div className="mt-5 space-y-6">
+      <VatFilingDecisionCalculator />
+      <AdvisorCostBenefitCalculator
+        contextLabel="부가세"
+        defaultSituation="income_tax"
+        defaultTaxRatePercent={10}
+        defaultAdvisorFeeManwon="30"
+        defaultMissedDeductionManwon="100"
+      />
+        </div>
+      </details>
     </div>
   );
 }

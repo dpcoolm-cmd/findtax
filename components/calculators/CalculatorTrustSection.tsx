@@ -40,11 +40,11 @@ export function CalculatorTrustSection({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-[#D5D9D2] bg-white p-8">
+      <div data-calculator-result role="status" aria-live="polite" aria-atomic="true" className="rounded-xl border border-[#D5D9D2] bg-white p-5 sm:p-8">
         <p className="text-sm font-medium text-neutral-600">산출 결과</p>
         <p className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-baseline">
           <span className="text-sm font-medium text-neutral-800">{headlineLabel}</span>
-          <span className="text-5xl font-bold tracking-tight text-neutral-900">
+          <span className="break-all text-3xl font-bold tabular-nums tracking-tight text-neutral-900 sm:text-5xl">
             {amountWon.toLocaleString("ko-KR")}원
           </span>
         </p>
