@@ -184,6 +184,7 @@ export function YearEndTaxOptimizationCalculator() {
                   key={option.value}
                   type="button"
                   onClick={() => setTaxpayerType(option.value)}
+                  aria-pressed={selected}
                   className={`min-h-20 rounded-lg border p-3 text-left ${
                     selected
                       ? "border-[#6A442D] bg-[#F5F1EA]"
@@ -225,17 +226,23 @@ export function YearEndTaxOptimizationCalculator() {
             <MoneyField label="연금저축 납입액" value={pensionPaid} onChange={setPensionPaid} />
             <MoneyField label="IRP 납입액" value={irpPaid} onChange={setIrpPaid} />
             <MoneyField
-              label="ISA 만기자금 연금 전환액"
-              value={isaTransfer}
-              onChange={setIsaTransfer}
-              help="아직 전환하지 않았다면 0으로 두세요."
-            />
-            <MoneyField
               label="올해 추가 납입 가능액"
               value={extraBudget}
               onChange={setExtraBudget}
             />
           </div>
+
+          <details className="mt-5 rounded-lg border border-line p-4">
+            <summary className="min-h-11 cursor-pointer font-bold">선택: ISA 만기자금 연금 전환 · 현재 {isaTransfer || "0"}만원</summary>
+            <div className="mt-3">
+            <MoneyField
+              label="ISA 만기자금 연금 전환액"
+              value={isaTransfer}
+              onChange={setIsaTransfer}
+              help="아직 전환하지 않았다면 0으로 두세요."
+            />
+            </div>
+          </details>
 
           <p className="mt-8 text-sm font-black text-ink">3. 현금흐름 안전 점검</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -322,7 +329,7 @@ export function YearEndTaxOptimizationCalculator() {
                   {won(data.additionalEstimatedTaxBenefitWon)}
                 </p>
                 <p className="mt-3 text-xs leading-5 text-white/60">
-                  지방소득세 영향을 포함한 {data.estimatedEffectiveRatePct}% 단순 추정치
+                  지방소득세 영향을 포함한 {data.estimatedEffectiveRatePct}% 단순 추정치. 실제 환급액은 결정세액과 기납부세액에 따라 달라집니다.
                 </p>
               </div>
             </div>

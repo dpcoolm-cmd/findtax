@@ -39,17 +39,27 @@ export function RetirementIncomeCalculator() {
   const [errors, setErrors] = useState<string[]>([]);
   const [snapshot, setSnapshot] = useState<{ input: RetirementInput; calculatedAt: string } | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [errorKey, setErrorKey] = useState<keyof RetirementInput | null>(null);
   const started = useRef(false);
   const viewed = useRef(false);
   const resultRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (!viewed.current) { viewed.current = true; track("calculator_view"); } }, []);
 
-  function submit(event: FormEvent) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = Object.fromEntries(fields.map(f => [f.key, values[f.key].trim() === "" ? NaN : Number(values[f.key]) * (f.money ? 10000 : 1)])) as RetirementInput;
     const issues = validateRetirementInput(input);
-    setErrors(issues);
-    if (issues.length) return;
+    const invalid = fields.find(f => !(event.currentTarget.elements.namedItem(`retirement-${f.key}`) as HTMLInputElement)?.validity.valid);
+    const key = invalid?.key ?? (input.retirementAge < input.currentAge ? "retirementAge" : input.targetAge <= input.retirementAge ? "targetAge" : null);
+    const allIssues = invalid ? [`${invalid.label}: ${invalid.min}~${invalid.max}${invalid.unit} 범위의 유효한 숫자를 입력해 주세요.`, ...issues] : issues;
+    setErrors(allIssues);
+    setErrorKey(key);
+    if (allIssues.length) {
+      if (key && fields.slice(6).some(f => f.key === key)) setAdvancedOpen(true);
+      if (key) requestAnimationFrame(() => document.getElementById(`retirement-${key}`)?.focus());
+      return;
+    }
     setSnapshot({ input, calculatedAt: new Date().toLocaleDateString("ko-KR") });
     setDirty(false);
     track("calculator_complete");
@@ -59,7 +69,7 @@ export function RetirementIncomeCalculator() {
     return <div key={f.key} className="min-w-0">
       <label htmlFor={`retirement-${f.key}`} className="text-sm font-semibold text-ink">{f.label}</label>
       <div className="mt-2 flex min-h-12 items-center rounded-lg border border-line bg-white px-3 focus-within:ring-2 focus-within:ring-primary">
-        <input id={`retirement-${f.key}`} type="number" inputMode="decimal" required min={f.min} max={f.max} step={f.step ?? (f.money ? 0.01 : 1)}
+        <input id={`retirement-${f.key}`} name={`retirement-${f.key}`} autoComplete="off" aria-invalid={errorKey === f.key} aria-describedby={errorKey === f.key ? "retirement-input-errors" : undefined} type="number" inputMode="decimal" required min={f.min} max={f.max} step={f.step ?? (f.money ? 0.01 : 1)}
           value={values[f.key]} onChange={e => { setValues(v => ({ ...v, [f.key]: e.target.value })); setDirty(true); if (!started.current) { started.current = true; track("calculator_start"); } }}
           className="min-w-0 flex-1 bg-transparent py-3 text-lg font-bold outline-none" />
         <span className="ml-2 text-sm text-ink-muted">{f.unit}</span>
@@ -70,26 +80,28 @@ export function RetirementIncomeCalculator() {
   const noInflation = useMemo(() => snapshot ? calculateRetirementIncome({ ...snapshot.input, inflation: 0 }) : null, [snapshot]);
   const scenarios = useMemo(() => snapshot ? [2, 4, 6].map(rate => ({ rate, result: calculateRetirementIncome({ ...snapshot.input, annualReturn: rate }) })) : [], [snapshot]);
   return <div className="space-y-10">
-    <form onSubmit={submit} className="rounded-lg border border-line bg-white p-5 sm:p-7 print:hidden" aria-label="노후월급 계산 조건">
+    <form noValidate onSubmit={submit} className="rounded-lg border border-line bg-white p-5 sm:p-7 print:hidden" aria-label="노후월급 계산 조건">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-bold">내 노후의 기본 조건</h2>
-        <button type="button" title="예시 값으로 초기화" aria-label="예시 값으로 초기화" className="flex h-11 w-11 items-center justify-center rounded-lg border border-line" onClick={() => { setValues(initialValues); setSnapshot(null); setErrors([]); setDirty(false); started.current = false; }}><RotateCcw size={18} /></button>
+        <button type="button" title="예시 값으로 초기화" aria-label="예시 값으로 초기화" className="flex h-11 w-11 items-center justify-center rounded-lg border border-line" onClick={() => { setValues(initialValues); setSnapshot(null); setErrors([]); setErrorKey(null); setAdvancedOpen(false); setDirty(false); started.current = false; }}><RotateCcw size={18} /></button>
       </div>
       <p className="mt-2 text-sm leading-6 text-ink-muted">모르면 국민연금은 0원으로 계산해 보세요. 이미 퇴직했다면 현재 나이와 퇴직 나이를 같게 입력하세요.</p>
       <div className="mt-6 grid gap-5 md:grid-cols-2">{fields.slice(0, 6).map(field)}</div>
       <p className="mt-3 text-sm leading-6 text-ink-muted">수령 시작 나이는 본인의 국민연금 안내에서 확인하세요. 65세는 예시이며 퇴직 시점과 다를 수 있습니다.</p>
-      <details className="mt-6 border-y border-line py-4" open>
+      <p className="mt-3 text-sm text-ink-muted">처음 표시된 숫자는 예시입니다. 아래 추가 조건은 수익률 {values.annualReturn}%, 물가 {values.inflation}%, {values.targetAge}세까지를 가정합니다.</p>
+      <details className="mt-6 border-y border-line py-4" open={advancedOpen} onToggle={event => setAdvancedOpen(event.currentTarget.open)}>
         <summary className="cursor-pointer text-base font-bold">추가 자금과 계산 가정</summary>
         <div className="mt-5 grid gap-5 md:grid-cols-2">{fields.slice(6).map(field)}</div>
         <p className="mt-4 text-sm leading-6 text-ink-muted">퇴직연금과 그 외 노후자금은 중복 입력하지 마세요. 수익률은 보장되지 않으며, 기본값은 전망이 아닌 비교용 가정입니다.</p>
       </details>
-      {errors.length > 0 && <ul role="alert" className="mt-4 list-disc pl-5 text-negative-deep">{errors.map(e => <li key={e}>{e}</li>)}</ul>}
+      {errors.length > 0 && <ul id="retirement-input-errors" role="alert" className="mt-4 list-disc pl-5 text-negative-deep">{errors.map(e => <li key={e}>{e}</li>)}</ul>}
       <button type="submit" className="btn-primary mt-6 w-full gap-2"><Calculator size={19} />노후월급 계산하기</button>
       <p className="mt-3 text-center text-xs leading-5 text-ink-muted">입력한 금융 금액은 이 브라우저에서만 계산하며 서버에 저장하지 않습니다.</p>
     </form>
 
     <div ref={resultRef} tabIndex={-1} aria-live="polite" aria-atomic="false" className="scroll-mt-32 outline-none">
       {result && snapshot && noInflation ? <section aria-label="노후월급 계산 결과" className="space-y-8">
+        <p className="rounded-lg border border-line bg-white p-4 text-sm leading-7">이 결과의 조건: {snapshot.input.retirementAge}세 퇴직 · 월 생활비 {won(snapshot.input.spendingMonthlyWon)} · 국민연금 월 {won(snapshot.input.pensionMonthlyWon)} / {snapshot.input.pensionStartAge}세 시작 · 수익률 연 {snapshot.input.annualReturn}% · 물가 연 {snapshot.input.inflation}% · {snapshot.input.targetAge}세까지. 수익률과 자산 지속기간은 보장되지 않습니다.</p>
         <section className="hidden print:block">
           <h2 className="text-xl font-bold">FindTax 노후월급 리포트</h2>
           <p>계산일 {snapshot.calculatedAt}</p>

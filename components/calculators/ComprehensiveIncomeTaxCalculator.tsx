@@ -8,7 +8,8 @@ import { CalculatorTrustSection } from "@/components/calculators/CalculatorTrust
 import { IncomeFilingDecisionCalculator } from "@/components/calculators/IncomeFilingDecisionCalculator";
 import { ResultInsightCard } from "@/components/calculators/ResultInsightCard";
 import { comprehensiveIncomeInsight } from "@/lib/calculator-insights";
-import { parsePositiveWonString } from "@/lib/calculator-input";
+import { parseNonNegativeWonString } from "@/lib/calculator-input";
+import { IncomeTaxBaseHelper } from "@/components/calculators/IncomeTaxBaseHelper";
 import { bandComprehensiveIncome } from "@/lib/calculator-cta-bands";
 import {
   calculateComprehensiveIncomeTax,
@@ -25,7 +26,8 @@ export function ComprehensiveIncomeTaxCalculator() {
   const [raw, setRaw] = useState("");
 
   const result = useMemo(() => {
-    const parsed = parsePositiveWonString(raw);
+    if (!raw.trim()) return { error: null, data: null };
+    const parsed = parseNonNegativeWonString(raw);
     if (!parsed.ok) {
       return { error: raw.trim() === "" ? null : parsed.error, data: null as null };
     }
@@ -67,6 +69,7 @@ export function ComprehensiveIncomeTaxCalculator() {
             과세표준을 입력하면 즉시 산출세액과 유효세율을 참고용으로 확인합니다.
           </p>
         </div>
+      <IncomeTaxBaseHelper onApply={setRaw} />
       <label className="block text-sm font-medium text-neutral-800">
         <span className="inline-flex items-center gap-1.5">
           종합소득 과세표준 (원)
@@ -75,7 +78,7 @@ export function ComprehensiveIncomeTaxCalculator() {
               ?
             </span>
             <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-20 w-64 -translate-x-1/2 rounded-lg bg-[#0f1e3d] px-2.5 py-2 text-[11px] font-normal leading-relaxed text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-              총소득이 아닌, 인적공제·연금·의료비·신용카드 등 모든 소득공제를 뺀 금액이에요. 홈택스 종합소득세 신고서에서 확인할 수 있어요.
+              종합소득금액에서 적용 가능한 소득공제를 뺀 금액이에요. 의료비·교육비 등 세액공제와 원천징수액은 여기서 빼지 않아요.
             </span>
           </span>
         </span>
@@ -103,11 +106,12 @@ export function ComprehensiveIncomeTaxCalculator() {
         <>
           <CalculatorTrustSection
             show
-            headlineLabel="예상 세금:"
+            headlineLabel="국세 산출세액 (납부·환급액 아님):"
             amountWon={result.data.tax}
             basisLines={[
               `과세표준 ${won(result.data.taxable)} 구간에 2026년 산출세율·누진공제 적용`,
               `유효세율(참고) 약 ${result.data.eff.toFixed(2)}%`,
+              "지방소득세·세액공제·원천징수 등 정산 전 금액입니다.",
             ]}
             formulaModalBody={formulaBody}
           />

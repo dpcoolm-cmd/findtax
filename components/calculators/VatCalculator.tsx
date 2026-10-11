@@ -117,6 +117,12 @@ export function VatCalculator() {
           placeholder="예: 1,000,000"
         />
       </label>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+        <span>입력 예시:</span>
+        <button type="button" className="min-h-11 rounded-lg border border-line px-3 hover:bg-bg-muted" onClick={() => { setMode("supply"); setAmount("1000000"); }}>공급가액 100만원</button>
+        <button type="button" className="min-h-11 rounded-lg border border-line px-3 hover:bg-bg-muted" onClick={() => { setMode("gross"); setAmount("1100000"); }}>세포함 총액 110만원</button>
+      </div>
+      {result.data && <p className="mt-2 text-sm font-semibold">입력한 금액: {won(mode === "supply" ? result.data.supplyAmount : result.data.grossTotal)} · {((mode === "supply" ? result.data.supplyAmount : result.data.grossTotal) / 10000).toLocaleString("ko-KR")}만원</p>}
       {result.err ? <p role="alert" className="mt-2 text-sm text-red-600">{result.err}</p> : null}
       <p className="mt-2 text-xs text-neutral-500">
         일반 과세 10% 간이 계산. 영세·면세·매입세액공제·간이과세·불공제 미반영.
@@ -125,7 +131,7 @@ export function VatCalculator() {
         <>
           <CalculatorTrustSection
             show
-            headlineLabel="예상 세금:"
+            headlineLabel="거래 금액의 부가세 (신고 납부세액 아님):"
             amountWon={result.data.vat}
             basisLines={[
               mode === "supply" ? "공급가액 기준 10% 부가세" : "총액 기준 10/110 역산 부가세",

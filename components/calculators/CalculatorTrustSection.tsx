@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 export const CALCULATOR_REFERENCE_DISCLAIMER =
   "이 계산 결과는 참고용이며 실제 세액과 공제는 개인 상황에 따라 달라질 수 있습니다.";
@@ -25,16 +25,27 @@ export function CalculatorTrustSection({
   extraDisclaimer,
 }: CalculatorTrustSectionProps) {
   const [open, setOpen] = useState(false);
-
-  const onKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") setOpen(false);
-  }, []);
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !show) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); setOpen(false); }
+      if (event.key !== "Tab") return;
+      const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]') ?? []).filter(element => element.getClientRects().length > 0);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) { event.preventDefault(); dialogRef.current?.focus(); return; }
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onKey]);
+    return () => { document.removeEventListener("keydown", onKey); if (previous?.isConnected) previous.focus(); };
+  }, [open, show]);
 
   if (!show) return null;
 
@@ -84,14 +95,17 @@ export function CalculatorTrustSection({
             className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl border border-[#D5D9D2] bg-white p-6"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="calc-formula-title"
+            aria-labelledby={titleId}
+            ref={dialogRef}
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
-              <h3 id="calc-formula-title" className="text-lg font-semibold text-neutral-900">
+              <h3 id={titleId} className="text-lg font-semibold text-neutral-900">
                 {formulaModalTitle}
               </h3>
               <button
+                ref={closeRef}
                 type="button"
                 className="shrink-0 rounded-lg px-2 py-1 text-sm text-neutral-500 hover:bg-[#F8FAFC]"
                 onClick={() => setOpen(false)}

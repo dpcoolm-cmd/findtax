@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { CalculatorConsultCta } from "@/components/CalculatorConsultCta";
 import { CalculatorEstimateNotice } from "@/components/CalculatorEstimateNotice";
 import { GiftTaxCaseStart } from "@/components/GiftTaxCaseStart";
@@ -27,12 +27,14 @@ function formatMoneyInput(raw: string): string {
 }
 
 function HelpTip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
   return (
-    <span className="group relative inline-flex cursor-help items-center justify-center">
-      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#cbd5e1] text-[10px] font-bold text-[#64748b]">
-        ?
-      </span>
-      <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-20 w-56 -translate-x-1/2 rounded-lg bg-[#0f1e3d] px-2.5 py-2 text-[11px] font-normal leading-relaxed text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+    <span className="relative inline-flex flex-wrap items-center gap-2">
+      <button type="button" aria-label={`도움말: ${text}`} aria-expanded={open} aria-controls={id} onClick={event => { event.preventDefault(); setOpen(value => !value); }} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[#cbd5e1] text-sm font-bold text-[#64748b] focus-visible:outline focus-visible:outline-2">
+              ?
+      </button>
+      <span id={id} hidden={!open} className="max-w-xs rounded-lg bg-neutral-50 px-3 py-2 text-xs font-normal leading-relaxed text-neutral-700">
         {text}
       </span>
     </span>
