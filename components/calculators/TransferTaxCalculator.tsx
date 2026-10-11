@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { CalculatorConsultCta } from "@/components/CalculatorConsultCta";
 import { HomeAtozCta } from "@/components/HomeAtozCta";
 import { DecisionSummaryCard } from "@/components/calculators/DecisionSummaryCard";
@@ -47,16 +47,9 @@ function formatMoneyInput(raw: string): string {
 }
 
 function HelpTip({ text }: { text: string }) {
-  return (
-    <span className="group relative inline-flex cursor-help items-center justify-center">
-      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#D5D9D2] text-[10px] font-semibold text-neutral-500">
-        ?
-      </span>
-      <span className="pointer-events-none absolute bottom-[calc(100%+10px)] left-1/2 z-20 w-56 -translate-x-1/2 rounded-xl border border-[#D5D9D2] bg-white px-3 py-2 text-[11px] leading-relaxed text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100">
-        {text}
-      </span>
-    </span>
-  );
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return <span className="inline-flex flex-wrap items-center gap-2"><button type="button" aria-label={`도움말: ${text}`} aria-expanded={open} aria-controls={id} onClick={event => { event.preventDefault(); setOpen(value => !value); }} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-line focus-visible:outline focus-visible:outline-2">?</button><span id={id} hidden={!open} className="max-w-xs rounded-lg bg-surface-muted p-3 text-sm font-normal">{text}</span></span>;
 }
 
 function InputField({
@@ -178,6 +171,8 @@ function addYearsToYmd(ymd: string, years: number): string {
 }
 
 export function TransferTaxCalculator() {
+  const [confirmed, setConfirmed] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
   const resultViewTrackedRef = useRef<string | null>(null);
 
   const [acquisitionDate, setAcquisitionDate] = useState("");
@@ -210,6 +205,7 @@ export function TransferTaxCalculator() {
     }
 
     const parsedCost = parseNonNegativeManwonString(cost);
+    if (!cost.trim()) return { err: null, data: null, input: null };
     if (!parsedCost.ok) {
       return { err: parsedCost.error, data: null, input: null };
     }
@@ -563,7 +559,7 @@ export function TransferTaxCalculator() {
   ]);
 
   useEffect(() => {
-    if (!result.data || !result.input) return;
+    if (!confirmed || !result.data || !result.input) return;
 
     const trackingKey = [
       result.input.acquisitionDate,
@@ -580,14 +576,14 @@ export function TransferTaxCalculator() {
     trackSiteEvent("calculator_result_view", {
       calculatorType: "transfer_tax",
       resultBand: ctaBand,
-      finalTaxWon: result.data.finalTaxWon,
-      taxableTransferGainWon: result.data.taxableTransferGainWon,
+
       recommendationCount: recommendationItems.length,
       timingBestScenario: betterTimingScenario?.id ?? "now",
       isExempt: result.data.isExempt,
       isJointOwnership,
     });
   }, [
+    confirmed,
     betterTimingScenario,
     ctaBand,
     isJointOwnership,
@@ -608,10 +604,11 @@ export function TransferTaxCalculator() {
   };
 
   return (
-    <div className="rounded-xl border border-[#D5D9D2] bg-white px-6 py-16 shadow-card sm:px-10">
-      <div className="space-y-16">
+    <div onChangeCapture={() => setConfirmed(false)} className="rounded-xl border border-[#D5D9D2] bg-white px-4 py-6 shadow-card sm:px-8">
+      <p className="mb-6 rounded-lg bg-surface-muted p-4 text-sm leading-7">계약서와 비용 자료를 준비하세요. ① 날짜·자산 → ② 거래금액 → ③ 해당 조건 순서로 입력한 뒤 결과를 확인합니다. 국내 부동산 참고 계산이며 해외주식은 계산하지 않습니다.</p>
+      <div className="space-y-8">
         <section className="space-y-8">
-          <SectionTitle>기본 정보</SectionTitle>
+          <SectionTitle>1. 무엇을 언제 사고파나요?</SectionTitle>
           <div className="grid gap-8 md:grid-cols-2">
             <label className="block space-y-2">
               <span className="text-sm font-medium text-neutral-800">
@@ -657,7 +654,7 @@ export function TransferTaxCalculator() {
         </section>
 
         <section className="space-y-8">
-          <SectionTitle>금액 입력</SectionTitle>
+          <SectionTitle>2. 얼마에 사고파나요?</SectionTitle>
           <p className="text-sm leading-relaxed text-neutral-500">
             금액은 모두 <span className="font-medium text-neutral-700">만원 단위</span>로 입력해 주세요.
           </p>
@@ -675,6 +672,7 @@ export function TransferTaxCalculator() {
 
             <InputField
               label="취득가액"
+              required
               value={cost}
               onChange={setCost}
               tooltip="처음 살 때 지급한 실제 금액이에요."
@@ -700,7 +698,7 @@ export function TransferTaxCalculator() {
         </section>
 
         <section className="space-y-8">
-          <SectionTitle>기본 조건</SectionTitle>
+          <SectionTitle>3. 해당하는 조건을 확인하세요</SectionTitle>
           <div className="grid gap-4">
             <CheckRow
               checked={isOneHouseholdOneHome}
@@ -739,7 +737,7 @@ export function TransferTaxCalculator() {
 
         <details className="rounded-xl border border-[#D5D9D2] bg-[#F8FAFC] px-5 py-5">
           <summary className="cursor-pointer text-sm font-medium text-neutral-900">
-            추가 조건 · 고급 옵션
+            선택: 다주택·상속·미등기 등 추가 조건
           </summary>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <CheckRow
@@ -776,7 +774,7 @@ export function TransferTaxCalculator() {
         </details>
 
         {result.err ? (
-          <p className="rounded-xl border border-[#D5D9D2] bg-[#F8FAFC] px-5 py-4 text-sm text-neutral-700">
+          <p role="alert" className="rounded-xl border border-[#D5D9D2] bg-[#F8FAFC] px-5 py-4 text-sm text-neutral-700">
             {result.err}
           </p>
         ) : null}
@@ -787,10 +785,12 @@ export function TransferTaxCalculator() {
           </p>
         ) : null}
 
-        <RedFlagHints hints={redFlagHints} />
+        <button type="button" className="btn-primary min-h-12 w-full" disabled={!result.data} onClick={() => { setConfirmed(true); requestAnimationFrame(() => { resultRef.current?.focus(); resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }); }}>입력한 조건으로 양도세 확인하기</button>
+        <p role="status" className="text-sm text-ink-muted">{!result.data ? "날짜와 거래금액을 먼저 입력해 주세요. 취득가액은 필수이며 필요경비를 비우면 0원으로 계산합니다." : !confirmed ? "입력을 마쳤다면 결과 확인 버튼을 누르세요. 값을 바꾸면 다시 확인해야 합니다." : "현재 입력 조건으로 계산한 결과입니다."}</p>
+        <RedFlagHints hints={confirmed ? redFlagHints : []} />
 
-        {result.data ? (
-          <div className="space-y-10">
+        {result.data && confirmed ? (
+          <div ref={resultRef} tabIndex={-1} data-calculator-result className="scroll-mt-24 space-y-10 outline-none">
             <section className="rounded-xl border border-[#D5D9D2] bg-white px-6 py-10 sm:px-8 sm:py-12">
               <div className="space-y-4">
                 <p className="text-sm font-medium text-neutral-500">이번 케이스 한 줄 요약</p>
@@ -1036,7 +1036,7 @@ export function TransferTaxCalculator() {
           </div>
         ) : !result.err ? (
           <p className="text-sm leading-relaxed text-neutral-600">
-            취득일, 양도일, 양도가액을 입력하면 참고용 세액을 바로 확인할 수 있어요.
+            취득일·양도일·양도가액·취득가액을 입력하고 위 결과 확인 버튼을 누르세요. 금액을 모르면 계약서부터 확인해 주세요.
           </p>
         ) : null}
       </div>

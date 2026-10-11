@@ -46,6 +46,13 @@ export function RetirementIncomeCalculator() {
   const resultRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (!viewed.current) { viewed.current = true; track("calculator_view"); } }, []);
 
+  const resultVisibleTracked = useRef(false);
+  useEffect(() => {
+    if (!snapshot || !resultRef.current || resultVisibleTracked.current) return;
+    const observer = new IntersectionObserver(entries => { if (entries.some(entry=>entry.isIntersecting)) { resultVisibleTracked.current=true; track("calculator_result_visible"); observer.disconnect(); } },{threshold:0.1});
+    observer.observe(resultRef.current); return ()=>observer.disconnect();
+  },[snapshot]);
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = Object.fromEntries(fields.map(f => [f.key, values[f.key].trim() === "" ? NaN : Number(values[f.key]) * (f.money ? 10000 : 1)])) as RetirementInput;

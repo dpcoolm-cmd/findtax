@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BlogInlineCalculator } from "@/components/BlogInlineCalculator";
+import { getInlineCalculator } from "@/lib/blog/inline-calculator";
 import { BlogPostCta } from "@/components/BlogPostCta";
 import { AffiliateDisclosure, AffiliateOfferCard } from "@/components/monetization/AffiliateOfferCard";
 import { getAffiliateOfferForArticle } from "@/config/affiliate-offers";
@@ -201,6 +203,7 @@ export default async function BlogPostPage({ params }: Props) {
                 {s.checklist.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : null}
+            {getInlineCalculator(article.slug,s.h2) ? <BlogInlineCalculator slug={article.slug} {...getInlineCalculator(article.slug,s.h2)!} /> : null}
           </section>
         ))}
 

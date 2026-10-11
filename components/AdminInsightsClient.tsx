@@ -136,6 +136,7 @@ type InsightsResponse = {
   sources?: SourceRow[];
   devices?: DeviceRow[];
   phoneRegions?: PhoneRegionRow[];
+  calculatorJourneys?: { calculatorType: string; views: number; starts: number; visibleResults: number }[];
   calculators?: CalculatorInsight[];
   situations?: SituationInsight[];
   blogs?: BlogInsight[];
@@ -899,7 +900,10 @@ export function AdminInsightsClient() {
             </section>
 
             <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <h2 className="text-lg font-semibold text-neutral-950">계산기별 전환 흐름</h2>
+              <h2 className="text-lg font-semibold text-neutral-950">계산기 입력·결과 흐름</h2>
+              <p className="mt-2 text-sm leading-6 text-neutral-600">2026년 10월 11일부터 추가한 계측입니다. 아래는 이벤트 건수이며 고유 사용자 수나 동일 사용자 전환율이 아닙니다. 새로고침·수집 실패·기간 경계의 영향을 받으므로 적은 표본으로 이탈을 단정하지 마세요.</p>
+              <div className="mt-4 overflow-x-auto">{(data?.calculatorJourneys ?? []).length ? <table className="min-w-full text-sm"><thead><tr className="border-b text-left"><th className="p-3">계산기</th><th className="p-3">방문</th><th className="p-3">입력 시작</th><th className="p-3">결과 열람</th></tr></thead><tbody>{data?.calculatorJourneys?.map(item => <tr key={item.calculatorType} className="border-b"><th scope="row" className="p-3 text-left">{labelCalculator(item.calculatorType)}</th><td className="p-3">{format(item.views)}</td><td className="p-3">{format(item.starts)}</td><td className="p-3">{format(item.visibleResults)}</td></tr>)}</tbody></table> : <EmptyState>입력 흐름 계측 데이터가 아직 없습니다. 데이터가 없다는 사실만으로 사용자 이탈을 판단할 수 없습니다.</EmptyState>}</div>
+              <h2 className="mt-8 text-lg font-semibold text-neutral-950">기존 계산기 상담 전환 이벤트</h2>
               <div className="mt-4 overflow-x-auto">
                 {(data?.calculators ?? []).length === 0 ? (
                   <EmptyState>계산기 이벤트가 아직 없습니다.</EmptyState>

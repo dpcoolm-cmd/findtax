@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalculatorConsultCta } from "@/components/CalculatorConsultCta";
 import { CalculatorEstimateNotice } from "@/components/CalculatorEstimateNotice";
 import { AdvisorCostBenefitCalculator } from "@/components/calculators/AdvisorCostBenefitCalculator";
@@ -22,6 +22,8 @@ function won(n: number) {
 type VatInputMode = "supply" | "gross";
 
 export function VatCalculator() {
+  const [filingOpen,setFilingOpen] = useState(false);
+  useEffect(() => { const reveal = () => { if (window.location.hash === "#filing-check") { setFilingOpen(true); requestAnimationFrame(()=>document.getElementById("filing-check")?.scrollIntoView()); } }; reveal(); window.addEventListener("hashchange",reveal); return ()=>window.removeEventListener("hashchange",reveal); },[]);
   const [mode, setMode] = useState<VatInputMode>("supply");
   const [amount, setAmount] = useState("");
 
@@ -169,7 +171,7 @@ export function VatCalculator() {
         resultBand={ctaBand}
       />
       </section>
-      <details className="rounded-xl border border-line bg-white p-5">
+      <details id="filing-check" open={filingOpen} onToggle={event=>setFilingOpen(event.currentTarget.open)} className="scroll-mt-24 rounded-xl border border-line bg-white p-5">
         <summary className="min-h-11 cursor-pointer font-bold">선택: 신고 복잡도와 세무사 비용 비교</summary>
         <div className="mt-5 space-y-6">
       <VatFilingDecisionCalculator />

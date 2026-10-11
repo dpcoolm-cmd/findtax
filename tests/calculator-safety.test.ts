@@ -290,7 +290,7 @@ test("주 15시간 경계에서만 주휴수당이 발생한다", () => {
 
 test("퇴직금 계산은 잘못된 날짜를 거부하고 평균임금 산식을 보존한다", () => {
   assert.equal(calculateSeverancePay({ hireYmd: "2026-02-30", resignYmd: "2026-12-31", lastThreeMonthsSalaryTotal: 9_000_000 }), null);
-  const result = calculateSeverancePay({ hireYmd: "2025-01-01", resignYmd: "2025-12-31", lastThreeMonthsSalaryTotal: 9_000_000 });
+  const result = calculateSeverancePay({ hireYmd: "2025-01-01", resignYmd: "2026-01-01", lastThreeMonthsSalaryTotal: 9_000_000 });
   assert.ok(result);
   assert.equal(result.serviceDays, 365);
   assert.equal(result.netAfterTax, result.severanceGross - result.estimatedIncomeTax);
@@ -632,4 +632,20 @@ test("셀러 운영표 준비도 가중치는 정확히 100이고 필요한 문�
       (document) => document.key === "agency_contracts",
     ),
   );
+});
+
+
+test("단시간 주휴수당은 실제 출근일수로 나누지 않는다", () => {
+  const result = calculateWeeklyHolidayPay({ hourlyWon: 10_000, weeklyWorkHours: 18, weeklyWorkDays: 3 });
+  assert.equal(result.weeklyHolidayPay, 36_000);
+  assert.equal(result.dailyPrescribedHours, 3.6);
+  assert.equal(calculateWeeklyHolidayPay({ hourlyWon: 10_000, weeklyWorkHours: 48, weeklyWorkDays: 6 }).weeklyHolidayPay, 80_000);
+});
+
+test("고용노동부 퇴직금 예시의 날짜와 임금 가산을 재현한다", () => {
+  const result = calculateSeverancePay({ hireYmd: "2014-10-02", resignYmd: "2017-09-16", lastThreeMonthsSalaryTotal: 7_080_000, bonusInPeriodWon: 1_000_000, annualLeaveAllowanceInPeriodWon: 75_000 });
+  assert.ok(result);
+  assert.equal(result.serviceDays, 1080);
+  assert.equal(result.referencePeriodDays, 92);
+  assert.equal(result.wageTotalForAverage, 8_155_000);
 });

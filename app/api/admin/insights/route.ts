@@ -490,6 +490,7 @@ export async function GET(req: Request) {
   const sourceMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
   const phoneRegionMap = new Map<string, number>();
+  const calculatorJourneyMap = new Map<string, { calculatorType: string; views: number; starts: number; visibleResults: number }>();
   const calculatorMap = new Map<string, CalculatorInsight>();
   const situationMap = new Map<string, SituationInsight>();
   const blogMap = new Map<string, BlogInsight>();
@@ -525,6 +526,13 @@ export async function GET(req: Request) {
     if (calculatorType) ensureCalculator(calculatorMap, calculatorType);
     if (situationId) ensureSituation(situationMap, situationId);
 
+    if (calculatorType && ["calculator_view", "calculator_start", "calculator_result_visible"].includes(row.event_type)) {
+      const item = calculatorJourneyMap.get(calculatorType) ?? { calculatorType, views: 0, starts: 0, visibleResults: 0 };
+      if (row.event_type === "calculator_view") item.views += 1;
+      if (row.event_type === "calculator_start") item.starts += 1;
+      if (row.event_type === "calculator_result_visible") item.visibleResults += 1;
+      calculatorJourneyMap.set(calculatorType, item);
+    }
     switch (row.event_type) {
       case "page_view":
         totalPageViews += 1;
@@ -691,6 +699,7 @@ export async function GET(req: Request) {
     sources: topEntries(sourceMap, 8).map(({ key, count }) => ({ source: key, pageViews: count })),
     devices: topEntries(deviceMap, 5).map(({ key, count }) => ({ device: key, pageViews: count })),
     phoneRegions: topEntries(phoneRegionMap, 10).map(({ key, count }) => ({ region: key, phoneClicks: count })),
+    calculatorJourneys: Array.from(calculatorJourneyMap.values()).sort((a,b) => b.views - a.views),
     calculators: Array.from(calculatorMap.values()).sort((a, b) => b.resultViews - a.resultViews),
     situations: Array.from(situationMap.values()).sort((a, b) => b.pageViews - a.pageViews),
     blogs: Array.from(blogMap.values())

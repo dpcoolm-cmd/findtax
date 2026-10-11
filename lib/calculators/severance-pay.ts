@@ -20,18 +20,17 @@ export function serviceDaysInclusive(start: Date, end: Date): number {
 }
 
 /**
- * 퇴직일 전 3개월간 임금 산정용 달력일수(행안부 안내 흐름과 동일하게,
- * 퇴직일에서 3개월 전 같은 날의 다음 날부터 퇴직일까지 일수).
+ * 퇴직일 전 3개월간 임금 산정용 달력일수(고용노동부 안내에 따라,
+ * 퇴직일에서 3개월 전 같은 날부터 퇴직일 전날까지 일수).
  */
-export function wageReferencePeriodDaysInclusive(resign: Date): number {
-  const y = resign.getFullYear();
-  const m = resign.getMonth();
-  const d = resign.getDate();
-  const end = new Date(y, m, d);
-  const start = new Date(y, m - 3, d);
-  start.setDate(start.getDate() + 1);
-  return serviceDaysInclusive(start, end);
+export function wageReferencePeriod(resign: Date): { start: Date; end: Date; days: number } {
+  const monthStart = new Date(resign.getFullYear(), resign.getMonth() - 3, 1);
+  const lastDay = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+  const start = new Date(monthStart.getFullYear(), monthStart.getMonth(), Math.min(resign.getDate(), lastDay));
+  const end = new Date(resign.getFullYear(), resign.getMonth(), resign.getDate() - 1);
+  return { start, end, days: serviceDaysInclusive(start, end) };
 }
+export function wageReferencePeriodDaysInclusive(resign: Date): number { return wageReferencePeriod(resign).days; }
 
 export function calculateSeverancePay(input: {
   hireYmd: string;
@@ -69,7 +68,7 @@ export function calculateSeverancePay(input: {
   const wageTotal = Math.max(0, salaryRaw) + bonus + annual;
   if (wageTotal <= 0) return null;
 
-  const serviceDays = serviceDaysInclusive(hire, resign);
+  const serviceDays = serviceDaysInclusive(hire, resign) - 1;
   if (serviceDays < 1) return null;
 
   const referencePeriodDays = wageReferencePeriodDaysInclusive(resign);
