@@ -16,6 +16,8 @@ export function CalculatorSearchGuide({ slug }: { slug: string }) {
     <ol className="list-decimal space-y-2 pl-5 text-sm leading-7">{guide.steps.map(step => <li key={step}>{step}</li>)}</ol>
     <p className="border-l-2 border-primary pl-4 text-sm leading-7 text-ink-muted">{guide.limit}</p>
     {articles.length > 0 && <div><h3 className="font-bold">결과를 이해하는 세금 가이드</h3><ul className="mt-3 space-y-3">{articles.map(({ article }) => <li key={article.slug}><Link className="text-sm font-semibold underline underline-offset-4" href={`/blog/${article.slug}`}>{article.h1}</Link></li>)}</ul></div>}
-    {related.length > 0 && <nav aria-label="관련 계산기" className="flex flex-wrap gap-3">{related.map(item => <Link key={item.key} href={item.href} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:bg-bg-muted">{item.title}</Link>)}</nav>}
+    {related.length > 0 && <nav aria-label="관련 계산기" className="flex flex-wrap gap-3">{related.map(item => item.key === "travel-customs"
+      ? <a key={item.key} href={item.href} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:bg-bg-muted">{item.title}</a>
+      : <Link key={item.key} href={item.href} className="rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:bg-bg-muted">{item.title}</Link>)}</nav>}
   </section>;
 }

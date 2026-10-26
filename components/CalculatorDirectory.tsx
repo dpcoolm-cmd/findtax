@@ -49,8 +49,10 @@ export function CalculatorDirectory({
         </div>
         <p aria-live="polite" className={`mt-4 text-sm ${dark ? "text-white/80" : "text-ink-muted"}`}>{group} · {items.length}개</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item) => (
-            <Link
+          {items.map((item) => {
+            // A full navigation keeps the calculator free of auto ads loaded on other routes.
+            const CardLink = item.key === "travel-customs" ? "a" : Link;
+            return <CardLink
               key={item.key}
               href={item.href}
               className={`group flex min-h-[168px] flex-col rounded-lg border p-5 transition-colors duration-200 ${
@@ -96,8 +98,8 @@ export function CalculatorDirectory({
               >
                 <ArrowRight size={17} />
               </span>
-            </Link>
-          ))}
+            </CardLink>;
+          })}
         </div>
       </div>
     </section>

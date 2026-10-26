@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { AppShell } from "@/components/AppShell";
+import { AutoAdsScript } from "@/components/AutoAdsScript";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { getBaseUrl, siteDescription, siteName } from "@/lib/seo/site";
@@ -84,17 +85,7 @@ export default function RootLayout({
           content="482df90ab22d80ffab80cbcac33a281c06d36fba"
         />
       </head>
-      {adsenseClient ? (
-        <Script
-          id="google-adsense"
-          async
-          crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-          // 자동광고가 하이드레이션 전에 DOM에 광고를 넣으면 React #418(하이드레이션 불일치)로
-          // 페이지가 클라이언트에서 다시 그려지며 광고가 지워진다. 하이드레이션 이후에 로드한다.
-          strategy="afterInteractive"
-        />
-      ) : null}
+      {adsenseClient ? <AutoAdsScript clientId={adsenseClient} /> : null}
       <body className="min-h-dvh touch-manipulation bg-bg font-sans font-medium text-ink antialiased">
         <script
           type="application/ld+json"

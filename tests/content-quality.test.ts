@@ -117,14 +117,17 @@ test("short articles do not acquire automatic length padding", () => {
 
 test("global layout preserves analytics and loads approved AdSense auto ads once", () => {
   const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const autoAds = readFileSync(new URL("../components/AutoAdsScript.tsx", import.meta.url), "utf8");
   const footer = readFileSync(new URL("../components/Footer.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(layout, /CoupangRecommendBanner|<SiteAd|130px/);
   assert.doesNotMatch(footer, /<SiteAd/);
   assert.match(layout, /google-adsense-account/);
-  assert.match(layout, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=/);
-  assert.match(layout, /id="google-adsense"[\s\S]*?strategy="afterInteractive"/);
-  assert.equal((layout.match(/id="google-adsense"/g) ?? []).length, 1);
-  assert.match(layout, /crossOrigin="anonymous"/);
+  assert.match(layout, /<AutoAdsScript clientId=/);
+  assert.match(autoAds, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=/);
+  assert.match(autoAds, /pathname === "\/calculator\/travel-customs"/);
+  assert.match(autoAds, /id="google-adsense"[\s\S]*?strategy="afterInteractive"/);
+  assert.equal((autoAds.match(/id="google-adsense"/g) ?? []).length, 1);
+  assert.match(autoAds, /crossOrigin="anonymous"/);
   assert.match(layout, /google-tag-manager/);
   assert.match(footer, /\/editorial-policy/);
   assert.match(footer, /\/about/);
