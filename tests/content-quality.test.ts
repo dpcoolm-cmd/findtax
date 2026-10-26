@@ -122,21 +122,24 @@ test("global layout preserves analytics and loads approved AdSense auto ads once
   assert.doesNotMatch(footer, /<SiteAd/);
   assert.match(layout, /google-adsense-account/);
   assert.match(layout, /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=/);
-  assert.match(layout, /strategy="beforeInteractive"/);
+  assert.match(layout, /id="google-adsense"[\s\S]*?strategy="afterInteractive"/);
+  assert.equal((layout.match(/id="google-adsense"/g) ?? []).length, 1);
   assert.match(layout, /crossOrigin="anonymous"/);
   assert.match(layout, /google-tag-manager/);
   assert.match(footer, /\/editorial-policy/);
   assert.match(footer, /\/about/);
 });
 
-test("remote article batches stay registered and sitemap excludes regional details", () => {
+test("remote article batches stay registered and sitemap includes eligible regional listings", () => {
   const posts = readFileSync(new URL("../lib/blog/posts.ts", import.meta.url), "utf8");
   for (let part = 6; part <= 11; part++) {
     assert.match(posts, new RegExp(`import \\{ BLOG_ARTICLES_PART${part} \\}`));
     assert.match(posts, new RegExp(`^  BLOG_ARTICLES_PART${part},`, "m"));
   }
   const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
-  assert.doesNotMatch(sitemap, /regionSidoPath|regionSigunguPath|listActiveRegionPairs/);
+  assert.match(sitemap, /listIndexableRegions/);
+  assert.match(sitemap, /regionSidoPath|regionSigunguPath/);
+  assert.doesNotMatch(sitemap, /taxaccountant\/\[id\]|\/taxaccountant\/\$\{/);
   assert.doesNotMatch(sitemap, /new Date\(\)/);
   assert.match(sitemap, /new Date\(article.dateModified\)/);
 });

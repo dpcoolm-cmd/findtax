@@ -31,6 +31,14 @@ export type CalculatorDirectoryItem = {
 
 export const CALCULATOR_DIRECTORY: CalculatorDirectoryItem[] = [
   {
+    key: "travel-customs",
+    title: "해외여행 면세·관세 계산기",
+    shortTitle: "여행자 관세",
+    description: "800달러 면세한도·술 2L·일본 면세 환급까지 확인합니다.",
+    href: "/calculator/travel-customs",
+    category: "여행·해외쇼핑",
+  },
+  {
     key: "solo-business",
     title: "1인사업자 세무 운영표",
     shortTitle: "1인사업자",
@@ -158,8 +166,9 @@ export const CALCULATOR_DIRECTORY: CalculatorDirectoryItem[] = [
   },
 ];
 
-export const CALCULATOR_GROUPS = ["사업·부업", "부동산", "상속·증여", "근로", "연금·재무"] as const;
+export const CALCULATOR_GROUPS = ["사업·부업", "부동산", "상속·증여", "근로", "연금·재무", "여행·해외쇼핑"] as const;
 export function calculatorGroup(item: CalculatorDirectoryItem): typeof CALCULATOR_GROUPS[number] {
+  if (item.key === "travel-customs") return "여행·해외쇼핑";
   if (["year-end-tax", "retirement-income", "savings-interest"].includes(item.key)) return "연금·재무";
   if (["inheritance-gift", "gift-tax"].includes(item.key)) return "상속·증여";
   if (["severance-pay", "social-insurance", "weekly-holiday-pay"].includes(item.key)) return "근로";
